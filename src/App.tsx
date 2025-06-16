@@ -11,7 +11,8 @@ import {
   Check,
   Star,
   Users,
-  Clock
+  Clock,
+  Smile
 } from 'lucide-react';
 import SignupModal from './components/SignupModal';
 import AboutUs from './components/AboutUs';
@@ -269,9 +270,15 @@ function App() {
                         <span className="font-medium">Create Document</span>
                       </div>
                     </div>
-                    <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg cursor-pointer hover:from-green-600 hover:to-green-700 transition-all">
-                      <Lightbulb className="w-6 h-6 mb-2" />
-                      <span className="font-medium">Brainstorm Content</span>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg cursor-pointer hover:from-green-600 hover:to-green-700 transition-all">
+                        <Lightbulb className="w-6 h-6 mb-2" />
+                        <span className="font-medium">Creative Ideas</span>
+                      </div>
+                      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 rounded-lg cursor-pointer hover:from-orange-600 hover:to-orange-700 transition-all">
+                        <Smile className="w-6 h-6 mb-2" />
+                        <span className="font-medium">Entertain Me</span>
+                      </div>
                     </div>
                   </div>
                 )}
