@@ -319,7 +319,7 @@ const SEOBlogArticle: React.FC<{ onBack: () => void; onHome: () => void }> = ({ 
               <li><strong>Enter your topic or niche</strong><br />
                 Example: "AI for content marketing"</li>
               <li><strong>Get keyword suggestions</strong><br />
-                Dorp.ai will recommend primary and secondary keywords, such as "AI blog writing," "SEO content generator,\" and "AI-powered blog posts."</li>
+                Dorp.ai will recommend primary and secondary keywords, such as "AI blog writing," "SEO content generator," and "AI-powered blog posts."</li>
               <li><strong>Analyze search intent</strong><br />
                 Select keywords that match your goals—informational, commercial, or navigational.</li>
             </ol>
@@ -582,7 +582,140 @@ const AIPromptsArticle: React.FC<{ onBack: () => void; onHome: () => void }> = (
               Effective AI prompts serve multiple functions beyond simple content generation. They help streamline brainstorming when creative blocks arise, maintain consistency in tone and style across different content pieces, and scale output without proportionally increasing headcount. Perhaps most importantly, they enable marketers to optimize content performance through data-driven insights and automated analytics.
             </p>
 
-            {/* Continue with rest of the article content... */}
+            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">The Top 10 AI Prompts Every Content Marketer Needs</h2>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">1. The Strategic Blog Post Generator</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              <strong>Purpose:</strong> Create comprehensive, SEO-optimized blog content that drives organic traffic and establishes thought leadership.
+            </p>
+            
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+              <p className="text-gray-800 font-semibold mb-2">Template:</p>
+              <div className="text-gray-700 text-sm font-mono">
+                <p>Role: You are an expert content strategist with 10+ years of experience in [INDUSTRY]</p>
+                <p>Task: Write a [WORD COUNT] blog post titled "[TITLE]"</p>
+                <p>Audience: [TARGET AUDIENCE - be specific about demographics, pain points, and interests]</p>
+                <p>SEO Focus: Primary keyword "[KEYWORD]" with supporting keywords [LIST 3-5 RELATED KEYWORDS]</p>
+                <p>Structure: Include H2s and H3s, compelling introduction with hook, 3-5 main sections with actionable insights, and strong conclusion with CTA</p>
+                <p>Tone: [Professional/Conversational/Educational] - align with brand voice</p>
+                <p>Include: Real-world examples, data points, and practical takeaways readers can implement immediately</p>
+              </div>
+            </div>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">2. Social Media Content Calendar Creator</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              <strong>Purpose:</strong> Generate platform-specific social media content that drives engagement and builds community.
+            </p>
+            
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+              <p className="text-gray-800 font-semibold mb-2">Template:</p>
+              <div className="text-gray-700 text-sm font-mono">
+                <p>Context: Create a 1-week social media content plan for [PLATFORM - Instagram/LinkedIn/X/TikTok]</p>
+                <p>Brand: [COMPANY NAME] in [INDUSTRY]</p>
+                <p>Audience: [DETAILED AUDIENCE DESCRIPTION]</p>
+                <p>Content Themes: [LIST 2-3 KEY THEMES OR TOPICS]</p>
+                <p>Requirements:</p>
+                <p>- 7 unique posts with captions, hashtags, and posting times</p>
+                <p>- Mix of content types: [Educational/Behind-the-scenes/User-generated/Promotional]</p>
+                <p>- Platform-specific optimization for [PLATFORM] algorithm</p>
+                <p>- Include engagement questions and clear CTAs</p>
+                <p>- Align with brand voice: [TONE DESCRIPTION]</p>
+              </div>
+            </div>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">3. Email Campaign Sequence Builder</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              <strong>Purpose:</strong> Create high-converting email sequences that nurture leads and drive sales.
+            </p>
+            
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+              <p className="text-gray-800 font-semibold mb-2">Template:</p>
+              <div className="text-gray-700 text-sm font-mono">
+                <p>Campaign Goal: [SPECIFIC OBJECTIVE - lead nurturing/product launch/retention]</p>
+                <p>Audience Segment: [DETAILED DESCRIPTION of subscriber characteristics and behaviors]</p>
+                <p>Sequence Length: [NUMBER] emails over [TIME PERIOD]</p>
+                <p>Brand Voice: [TONE AND STYLE GUIDELINES]</p>
+                <p>For each email, provide:</p>
+                <p>- Subject line (A/B test variations)</p>
+                <p>- Preview text</p>
+                <p>- Email body with clear value proposition</p>
+                <p>- Strategic CTA placement</p>
+                <p>- Personalization opportunities</p>
+              </div>
+            </div>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">4. Content Repurposing Engine</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              <strong>Purpose:</strong> Transform one piece of content into multiple formats for maximum reach and efficiency.
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">5. Audience Research and Persona Developer</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              <strong>Purpose:</strong> Create detailed audience insights that inform all content strategy decisions.
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">6. Competitive Content Analysis</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              <strong>Purpose:</strong> Identify content gaps and opportunities in your industry landscape.
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">7. Campaign Performance Optimizer</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              <strong>Purpose:</strong> Analyze and improve existing campaign performance through data-driven insights.
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">8. Brand Voice and Messaging Consistency Creator</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              <strong>Purpose:</strong> Ensure consistent brand communication across all content and channels.
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">9. Crisis Communication and Response Generator</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              <strong>Purpose:</strong> Prepare responsive, empathetic communication for challenging situations.
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">10. ROI-Focused Content Strategy Planner</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              <strong>Purpose:</strong> Create content strategies directly tied to business objectives and measurable outcomes.
+            </p>
+
+            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">Advanced Prompt Optimization Techniques for 2025</h2>
+            
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">The Prompt Pyramid Method</h3>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              The most effective content marketing teams in 2025 use a systematic approach called the Prompt Pyramid Method, which ensures optimal prompt performance at every stage. This framework consists of four levels: Strategy Prompts for audience research and content planning, Creation Prompts for generating compelling content, Enhancement Prompts for quality improvement, and Distribution Prompts for cross-platform optimization.
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">Data-Driven Prompt Engineering</h3>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              Modern prompt effectiveness requires incorporating relevant data directly within prompts to improve accuracy and relevance. This technique, known as data-driven prompting, provides AI with specific examples or facts that guide responses toward more insightful and contextually appropriate outputs.
+            </p>
+
+            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">Implementation Best Practices and Success Metrics</h2>
+            
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">Getting Started with AI Prompts</h3>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              Successful implementation begins with creating a golden dataset of 50-100 real-world user requests paired with ideal outputs. This dataset serves as the foundation for testing and refining prompts before full deployment. Teams should start with the most impactful use cases—typically blog content and social media posts—before expanding to more complex applications.
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">Measuring Success and ROI</h3>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              Content marketing teams should track specific metrics to quantify prompt effectiveness: time saved per content piece, quality ratings from stakeholders, engagement metrics across channels, and conversion rates for AI-generated content. Leading organizations report average time savings of 5+ hours weekly through effective prompt implementation, with content quality scores improving by 40-70%.
+            </p>
+
+            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">Conclusion: The Future of AI-Powered Content Marketing</h2>
+            
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              The content marketing landscape of 2025 belongs to teams that master strategic prompt engineering, combining creative thinking with systematic optimization. The ten prompts outlined in this guide provide a comprehensive foundation for leveraging AI across all major content marketing activities, from strategic planning to performance optimization.
+            </p>
+
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              Success in AI-powered content marketing requires more than just using these tools—it demands understanding how to craft prompts that align with business objectives, audience needs, and platform requirements. Teams that invest in developing prompt engineering expertise will gain significant competitive advantages through improved efficiency, enhanced creativity, and measurable performance improvements.
+            </p>
+
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              As AI continues to evolve, the ability to communicate effectively with these systems becomes increasingly valuable. The prompts and strategies outlined here represent current best practices, but the most successful marketers will continue adapting and refining their approaches based on performance data and emerging capabilities. Start implementing these prompts today, measure their impact systematically, and iterate based on results to build a sustainable competitive advantage in the AI-powered content marketing era.
+            </p>
           </div>
 
           {/* Call to Action */}
@@ -694,7 +827,193 @@ const PromptEngineeringArticle: React.FC<{ onBack: () => void; onHome: () => voi
               Let's explore how structured prompts (like Dorps) can transform your workflow and save you hours every week across content creation, email writing, document generation, and research tasks.
             </p>
 
-            {/* Continue with rest of the article content... */}
+            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">What Is Prompt Engineering?</h2>
+            
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">The Basics Explained</h3>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              Prompt engineering is the process of structuring or crafting instructions to produce the best possible output from generative AI models. Think of it as learning to speak the language of AI effectively—the better your communication, the better your results.
+            </p>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              Unlike casual conversations with AI where you might ask vague questions and hope for useful answers, prompt engineering involves deliberately designing your inputs to maximize the quality, relevance, and accuracy of AI-generated outputs. It combines elements of logic, coding, and creative communication to guide AI systems toward desired outcomes.
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">Why Prompt Engineering Matters</h3>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              The difference between a poorly engineered prompt and a well-crafted one can be dramatic. Generic prompts often lead to generic, unfocused results that require extensive editing and refinement. In contrast, structured prompts provide clear guidance that helps AI models understand exactly what you're looking for.
+            </p>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              Consider this: knowledge workers lose an estimated 25% of their productive time correcting or redirecting AI responses that miss the mark. With proper prompt engineering, you can eliminate most of this wasted effort and get usable results on your first attempt.
+            </p>
+
+            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">The Science Behind Structured Prompts</h2>
+            
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">From Conversational to Structured Prompting</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              There are two primary approaches to interacting with AI systems: conversational and structured prompting.
+            </p>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              <strong>Conversational prompting</strong> involves casual, natural language interactions—similar to how you might chat with a colleague. While accessible and intuitive, this approach often requires multiple back-and-forth exchanges to refine results.
+            </p>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              <strong>Structured prompting</strong> takes a more deliberate approach by precisely encoding instructions, examples, and constraints. This method translates human knowledge into a prompt "script" that guides the AI system through a specific workflow.
+            </p>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              Research consistently shows that structured prompts outperform conversational ones across various tasks. In one study comparing the two approaches for content creation, structured prompts produced significantly better results—generating content tailored to specific audiences with relevant details, while conversational prompts yielded generic, unfocused outputs.
+            </p>
+
+            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">How Structured Prompts Save You Time</h2>
+            
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">The Productivity Impact</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              The time-saving potential of well-engineered prompts is substantial and measurable. Research indicates that knowledge workers can save an average of 5+ hours weekly by implementing better prompting techniques. This translates to:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 mb-6 ml-4">
+              <li>68 minutes saved weekly on research tasks</li>
+              <li>97 minutes saved weekly on content creation</li>
+              <li>134 minutes saved weekly on data analysis</li>
+            </ul>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              When calculated over a year, this represents a potential ROI of 1,170% based on the time investment required to learn effective prompt engineering techniques.
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">Task-Specific Time Savings</h3>
+            
+            <h4 className="text-lg font-semibold text-gray-900 mt-4 mb-2">Content Creation</h4>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              Content creators report some of the most dramatic time savings from structured prompts. Traditional content creation workflows often involve hours of planning, drafting, editing, and refinement. With structured prompts, you can:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 mb-6 ml-4">
+              <li>Generate comprehensive content briefs in minutes instead of hours</li>
+              <li>Adapt content for multiple platforms simultaneously</li>
+              <li>Create consistent brand messaging across all channels</li>
+            </ul>
+
+            <h4 className="text-lg font-semibold text-gray-900 mt-4 mb-2">Email Writing</h4>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              Professionals spend an average of 8.8 hours weekly on email correspondence—a significant portion of the workweek. Structured prompts can transform this process by:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 mb-6 ml-4">
+              <li>Reducing email drafting time from 30 minutes to just 5 minutes per message</li>
+              <li>Ensuring consistent tone and messaging across all communications</li>
+              <li>Eliminating errors and improving clarity without extensive editing</li>
+            </ul>
+
+            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">Structured Prompts vs. Generic Prompts: The Performance Gap</h2>
+            
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">Measurable Differences</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              The performance gap between structured and generic prompts is substantial and measurable. In controlled comparisons:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 mb-6 ml-4">
+              <li>Structured prompts produce results that require 67% less editing time</li>
+              <li>They achieve 78% higher first-attempt success rates for coding tasks</li>
+              <li>They generate content with 4.8/5 average user satisfaction ratings (compared to 3.2/5 for generic prompts)</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">Real-World Examples</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">Consider these contrasting examples:</p>
+            
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+              <p className="text-sm font-semibold text-red-800 mb-2">Generic Prompt:</p>
+              <p className="text-red-700">"Write a marketing email about our new product."</p>
+            </div>
+
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+              <p className="text-sm font-semibold text-green-800 mb-2">Structured Prompt (Dorp):</p>
+              <div className="text-green-700 text-sm">
+                <p>Role: You are an expert email copywriter with 10+ years of experience in SaaS marketing</p>
+                <p>Task: Create a promotional email for our new AI productivity tool</p>
+                <p>Context: Our target audience is busy professionals aged 30-45 who struggle with email overload</p>
+                <p>Format: 3 paragraphs with a clear call-to-action</p>
+                <p>Tone: Professional but conversational, emphasizing time savings</p>
+              </div>
+            </div>
+
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              The generic prompt typically produces generic marketing language that requires substantial editing. The structured prompt (Dorp) generates a tailored email that's ready to use with minimal modifications, saving valuable time and mental energy.
+            </p>
+
+            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">Introducing Dorps: Structured Prompts Made Simple</h2>
+            
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">What Are Dorps?</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              Dorps are pre-engineered, platform-specific prompt templates designed to maximize AI output quality while minimizing user effort. Unlike generic prompts that produce inconsistent results, Dorps are structured to:
+            </p>
+            <ol className="list-decimal list-inside text-gray-700 mb-6 ml-4">
+              <li>Automatically adapt to specific AI platforms (like Replit, ChatGPT, or Midjourney)</li>
+              <li>Incorporate best practices from prompt engineering research</li>
+              <li>Include contextual elements that improve output relevance and quality</li>
+            </ol>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">How Dorps Work</h3>
+            <p className="text-gray-700 mb-2 leading-relaxed">Each Dorp follows a structured format that includes:</p>
+            <ul className="list-disc list-inside text-gray-700 mb-6 ml-4">
+              <li><strong>Clear role definition</strong> for the AI system</li>
+              <li><strong>Specific task instructions</strong> with measurable outcomes</li>
+              <li><strong>Relevant context</strong> to inform the AI's understanding</li>
+              <li><strong>Format specifications</strong> for the desired output</li>
+              <li><strong>Style and tone guidance</strong> to match your needs</li>
+            </ul>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              This structured approach eliminates the guesswork from prompt creation, allowing you to focus on your actual work rather than figuring out how to communicate with AI systems.
+            </p>
+
+            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">Practical Tips for Creating Your Own Structured Prompts</h2>
+            
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">The Elements of Effective Prompts</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              Even without using pre-built Dorps, you can improve your prompt engineering skills by incorporating these key elements:
+            </p>
+            <ol className="list-decimal list-inside text-gray-700 mb-6 ml-4">
+              <li><strong>Be specific about roles:</strong> Tell the AI what expert perspective to adopt (e.g., "Act as an experienced data analyst")</li>
+              <li><strong>Provide clear context:</strong> Include relevant background information that frames the task</li>
+              <li><strong>Define the format:</strong> Specify exactly how you want the information structured</li>
+              <li><strong>Include examples:</strong> When appropriate, show the AI what good outputs look like</li>
+              <li><strong>Set constraints:</strong> Establish boundaries for length, style, or content focus</li>
+            </ol>
+
+            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">Measuring Your Success with Structured Prompts</h2>
+            
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">Tracking Time Savings</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              To quantify the benefits of structured prompts in your workflow, consider tracking these metrics:
+            </p>
+            <ol className="list-decimal list-inside text-gray-700 mb-6 ml-4">
+              <li><strong>Time spent per task:</strong> Compare completion times before and after implementing structured prompts</li>
+              <li><strong>Iteration count:</strong> Track how many revisions are needed to achieve satisfactory results</li>
+              <li><strong>Quality ratings:</strong> Assess the usability of first-draft outputs on a 1-5 scale</li>
+              <li><strong>Cognitive load:</strong> Note how mentally taxing the process feels (1-10 scale)</li>
+            </ol>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              Many professionals find that structured prompts reduce their task completion time by 40-70% while simultaneously improving output quality.
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">Calculating Your ROI</h3>
+            <p className="text-gray-700 mb-4 leading-relaxed">You can calculate your personal return on investment using this formula:</p>
+            
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <p className="text-blue-800 font-mono text-sm">
+                ROI = (Time Saved × Hourly Rate × 52 weeks) ÷ (Time Investment in Learning Better Prompting)
+              </p>
+            </div>
+
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              For the average knowledge worker earning $45/hour and saving 5 hours weekly, the annual return exceeds $11,700—representing an ROI of over 1,000% based on a 10-hour learning investment.
+            </p>
+
+            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">Conclusion</h2>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              Prompt engineering isn't just a technical skill—it's a productivity multiplier that can transform how you work with AI systems. By mastering structured prompts like Dorps, you can dramatically reduce the time spent on routine tasks while improving output quality across content creation, email writing, document generation, and research.
+            </p>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              The data is clear: professionals who invest in learning prompt engineering techniques save an average of 5+ hours weekly—time that can be redirected to high-value work, creative thinking, or simply achieving better work-life balance.
+            </p>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              As AI continues to integrate into our professional workflows, the ability to communicate effectively with these systems becomes increasingly valuable. Structured prompts represent one of the highest-leverage skills you can develop to thrive in this evolving landscape.
+            </p>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              Start implementing these techniques today, and you'll likely find yourself wondering how you ever worked without them.
+            </p>
           </div>
 
           {/* Call to Action */}
