@@ -4,6 +4,7 @@ import { X, Mail, Lock, Eye, EyeOff, ChevronDown } from 'lucide-react';
 interface SignupModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSwitchToSignIn: () => void;
   selectedPlan: {
     name: string;
     price: string;
@@ -12,7 +13,7 @@ interface SignupModalProps {
   } | null;
 }
 
-const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, selectedPlan }) => {
+const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToSignIn, selectedPlan }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -284,11 +285,14 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, selectedPlan
             Continue with Google
           </button>
 
-          {/* Login Link */}
+          {/* Sign In Link */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
-              <button className="text-blue-600 hover:text-blue-700 font-medium underline">
+              <button 
+                onClick={onSwitchToSignIn}
+                className="text-blue-600 hover:text-blue-700 font-medium underline"
+              >
                 Sign in
               </button>
             </p>

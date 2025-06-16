@@ -17,6 +17,7 @@ import {
   X
 } from 'lucide-react';
 import SignupModal from './components/SignupModal';
+import SignInModal from './components/SignInModal';
 import AboutUs from './components/AboutUs';
 import TermsAndConditions from './components/TermsAndConditions';
 import PrivacyPolicy from './components/PrivacyPolicy';
@@ -27,6 +28,7 @@ function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [demoState, setDemoState] = useState('initial');
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
   const [showAboutUs, setShowAboutUs] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
@@ -81,6 +83,21 @@ function App() {
     }
     setIsSignupModalOpen(true);
     setIsMobileMenuOpen(false);
+  };
+
+  const handleSignInClick = () => {
+    setIsSignInModalOpen(true);
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleSwitchToSignup = () => {
+    setIsSignInModalOpen(false);
+    setIsSignupModalOpen(true);
+  };
+
+  const handleSwitchToSignIn = () => {
+    setIsSignupModalOpen(false);
+    setIsSignInModalOpen(true);
   };
 
   // Function to handle blog navigation and scroll to top
@@ -337,7 +354,7 @@ function App() {
                   Pricing
                 </button>
                 <button 
-                  onClick={() => handleSignupClick()}
+                  onClick={handleSignInClick}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
                   Sign In
@@ -382,7 +399,7 @@ function App() {
                     Pricing
                   </button>
                   <button 
-                    onClick={() => handleSignupClick()}
+                    onClick={handleSignInClick}
                     className="block w-full text-left bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-base font-medium transition-colors mt-2"
                   >
                     Sign In
@@ -723,11 +740,18 @@ function App() {
           </div>
         </footer>
 
-        {/* Signup Modal */}
+        {/* Modals */}
         <SignupModal 
           isOpen={isSignupModalOpen}
           onClose={() => setIsSignupModalOpen(false)}
+          onSwitchToSignIn={handleSwitchToSignIn}
           selectedPlan={selectedPlan}
+        />
+        
+        <SignInModal 
+          isOpen={isSignInModalOpen}
+          onClose={() => setIsSignInModalOpen(false)}
+          onSwitchToSignup={handleSwitchToSignup}
         />
       </div>
     </>
