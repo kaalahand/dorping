@@ -77,6 +77,33 @@ function App() {
     setIsSignupModalOpen(true);
   };
 
+  // Function to handle blog navigation and scroll to top
+  const handleBlogClick = () => {
+    setShowBlog(true);
+    // Scroll to top after state change
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 0);
+  };
+
+  // Function to handle privacy page navigation and scroll to top
+  const handlePrivacyClick = () => {
+    setShowPrivacy(true);
+    // Scroll to top after state change
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 0);
+  };
+
+  // Function to handle terms page navigation and scroll to top
+  const handleTermsClick = () => {
+    setShowTerms(true);
+    // Scroll to top after state change
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 0);
+  };
+
   const useCases = [
     {
       title: "Marketing Manager",
@@ -197,7 +224,7 @@ function App() {
                 About Us
               </button>
               <button 
-                onClick={() => setShowBlog(true)}
+                onClick={handleBlogClick}
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Blogs
@@ -523,19 +550,19 @@ function App() {
             </div>
             <div className="flex space-x-6">
               <button 
-                onClick={() => setShowPrivacy(true)}
+                onClick={handlePrivacyClick}
                 className="text-gray-300 hover:text-white transition-colors"
               >
                 Privacy
               </button>
               <button 
-                onClick={() => setShowTerms(true)}
+                onClick={handleTermsClick}
                 className="text-gray-300 hover:text-white transition-colors"
               >
                 Terms
               </button>
               <button 
-                onClick={() => setShowBlog(true)}
+                onClick={handleBlogClick}
                 className="text-gray-300 hover:text-white transition-colors"
               >
                 Blogs
