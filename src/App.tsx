@@ -14,10 +14,18 @@ import {
   Clock,
   Zap
 } from 'lucide-react';
+import SignupModal from './components/SignupModal';
 
 function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [demoState, setDemoState] = useState('initial');
+  const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<{
+    name: string;
+    price: string;
+    period: string;
+    prompts: string;
+  } | null>(null);
 
   // Animated demo cycle
   useEffect(() => {
@@ -39,6 +47,26 @@ function App() {
     if (pricingSection) {
       pricingSection.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const handleSignupClick = (plan?: typeof plans[0]) => {
+    if (plan) {
+      setSelectedPlan({
+        name: plan.name,
+        price: plan.price,
+        period: plan.period,
+        prompts: plan.prompts
+      });
+    } else {
+      // Default to Free plan for general signup buttons
+      setSelectedPlan({
+        name: 'Free',
+        price: '$0',
+        period: '',
+        prompts: '50 prompts'
+      });
+    }
+    setIsSignupModalOpen(true);
   };
 
   const useCases = [
@@ -136,7 +164,10 @@ function App() {
               >
                 Pricing
               </button>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+              <button 
+                onClick={() => handleSignupClick()}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
                 Sign In
               </button>
             </div>
@@ -158,7 +189,10 @@ function App() {
                 Our AI assistant asks the right questions to transform your simple thoughts into perfectly structured, ready-to-use content.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center">
+                <button 
+                  onClick={() => handleSignupClick()}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center"
+                >
                   Start for Free - 50 Prompts on Us
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </button>
@@ -379,11 +413,14 @@ function App() {
                       </li>
                     ))}
                   </ul>
-                  <button className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
-                    plan.popular 
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white' 
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
-                  }`}>
+                  <button 
+                    onClick={() => handleSignupClick(plan)}
+                    className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
+                      plan.popular 
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white' 
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                    }`}
+                  >
                     {plan.cta}
                   </button>
                 </div>
@@ -413,7 +450,10 @@ function App() {
               </div>
             ))}
           </div>
-          <button className="bg-white hover:bg-gray-100 text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold transition-colors shadow-lg">
+          <button 
+            onClick={() => handleSignupClick()}
+            className="bg-white hover:bg-gray-100 text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold transition-colors shadow-lg"
+          >
             Start Creating Today - It's Free
           </button>
         </div>
@@ -438,6 +478,13 @@ function App() {
           </div>
         </div>
       </footer>
+
+      {/* Signup Modal */}
+      <SignupModal 
+        isOpen={isSignupModalOpen}
+        onClose={() => setIsSignupModalOpen(false)}
+        selectedPlan={selectedPlan}
+      />
     </div>
   );
 }
