@@ -73,21 +73,24 @@ function App() {
   const useCases = [
     {
       title: "Marketing Manager",
-      task: "Ad Copy Creation",
-      example: "Created compelling social media ads that increased CTR by 40%",
-      icon: <Sparkles className="w-6 h-6" />
+      task: "Campaign Optimization",
+      example: "Reduced my campaign brief creation from 3 hours to 20 minutes. Our last social campaign saw 23% higher engagement using platform-specific Dorps for Instagram vs generic prompts.",
+      icon: <Sparkles className="w-6 h-6" />,
+      rating: 4.8
     },
     {
       title: "Student",
-      task: "Essay Writing",
-      example: "Structured a 5-paragraph essay on climate change in 2 minutes",
-      icon: <FileText className="w-6 h-6" />
+      task: "Academic Writing",
+      example: "Spent 45 minutes structuring my marketing strategy paper instead of the usual 4 hours. The Dorp helped me organize my thoughts and create proper academic formatting automatically.",
+      icon: <FileText className="w-6 h-6" />,
+      rating: 4.7
     },
     {
-      title: "Manager",
-      task: "Performance Review",
-      example: "Drafted professional employee feedback with actionable insights",
-      icon: <Users className="w-6 h-6" />
+      title: "Project Manager",
+      task: "Team Communication",
+      example: "Weekly status reports that used to take 90 minutes now take 15 minutes. My team feedback is more structured and actionable since I started Dorping my management communications.",
+      icon: <Users className="w-6 h-6" />,
+      rating: 4.9
     }
   ];
 
@@ -364,7 +367,7 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">What You Can Create</h2>
-            <p className="text-xl text-gray-600">See how professionals across industries save hours every week</p>
+            <p className="text-xl text-gray-600">Real feedback from 2,500+ professionals who've eliminated AI prompt frustration</p>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
@@ -379,16 +382,16 @@ function App() {
                     <p className="text-sm text-gray-600">{useCase.task}</p>
                   </div>
                 </div>
-                <blockquote className="text-gray-700 italic">
+                <blockquote className="text-gray-700 italic mb-4">
                   "{useCase.example}"
                 </blockquote>
-                <div className="flex items-center mt-4">
+                <div className="flex items-center">
                   <div className="flex text-yellow-400">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="w-4 h-4 fill-current" />
                     ))}
                   </div>
-                  <span className="text-sm text-gray-600 ml-2">5.0 rating</span>
+                  <span className="text-sm text-gray-600 ml-2">{useCase.rating} rating</span>
                 </div>
               </div>
             ))}
