@@ -15,12 +15,16 @@ import {
 } from 'lucide-react';
 import SignupModal from './components/SignupModal';
 import AboutUs from './components/AboutUs';
+import TermsAndConditions from './components/TermsAndConditions';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [demoState, setDemoState] = useState('initial');
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [showAboutUs, setShowAboutUs] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<{
     name: string;
     price: string;
@@ -151,9 +155,17 @@ function App() {
     }
   ];
 
-  // Show About Us page if requested
+  // Show different pages based on state
   if (showAboutUs) {
     return <AboutUs onBack={() => setShowAboutUs(false)} />;
+  }
+
+  if (showTerms) {
+    return <TermsAndConditions onBack={() => setShowTerms(false)} />;
+  }
+
+  if (showPrivacy) {
+    return <PrivacyPolicy onBack={() => setShowPrivacy(false)} />;
   }
 
   return (
@@ -491,8 +503,18 @@ function App() {
               <span className="text-xl font-bold">Dorp AI</span>
             </div>
             <div className="flex space-x-6">
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">Privacy</a>
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">Terms</a>
+              <button 
+                onClick={() => setShowPrivacy(true)}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Privacy
+              </button>
+              <button 
+                onClick={() => setShowTerms(true)}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Terms
+              </button>
               <a href="#" className="text-gray-300 hover:text-white transition-colors">Support</a>
             </div>
           </div>
