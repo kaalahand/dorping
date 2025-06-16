@@ -73,18 +73,18 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       description: 'Professional emails, follow-ups, and communications'
     },
     {
-      id: 'document',
-      title: 'Create Document',
+      id: 'content',
+      title: 'Create Content',
       icon: <FileText className="w-6 h-6" />,
       color: 'from-purple-500 to-purple-600',
-      description: 'Reports, proposals, and structured documents'
+      description: 'Blog posts, articles, and marketing content'
     },
     {
-      id: 'creative',
-      title: 'Creative Ideas',
+      id: 'master-prompts',
+      title: 'Create Master Prompts',
       icon: <Lightbulb className="w-6 h-6" />,
       color: 'from-green-500 to-green-600',
-      description: 'Brainstorming, creative writing, and ideation'
+      description: 'Advanced prompts and creative templates'
     },
     {
       id: 'entertainment',
@@ -101,11 +101,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       description: 'Programming, scripts, and technical documentation'
     },
     {
-      id: 'content',
-      title: 'Content Creation',
+      id: 'social',
+      title: 'Social Media',
       icon: <PenTool className="w-6 h-6" />,
       color: 'from-pink-500 to-pink-600',
-      description: 'Blog posts, social media, and marketing content'
+      description: 'Social media posts and engagement content'
     },
     {
       id: 'communication',
@@ -184,33 +184,80 @@ Would you be available for a brief call this week to discuss the details? I'm co
 Best regards,
 [Your Name]`;
         break;
-      case 'document':
-        sampleOutput = `# ${answers.goal || 'Project Proposal'}
+      case 'content':
+        sampleOutput = `# ${answers.goal || 'Engaging Content Strategy'}
 
-## Executive Summary
+## Introduction
 
-This document outlines a comprehensive approach to ${answers.goal || 'achieving our strategic objectives'} while maintaining a ${answers.tone || 'professional'} standard that resonates with our ${answers.audience || 'stakeholders'}.
+Creating compelling content that resonates with your ${answers.audience || 'target audience'} requires a strategic approach that balances ${answers.tone || 'engaging'} storytelling with valuable insights.
 
-## Objectives
+## Key Content Pillars
 
-- Primary Goal: ${answers.goal || 'Deliver exceptional results'}
-- Target Audience: ${answers.audience || 'Key stakeholders and team members'}
-- Approach: ${answers.tone || 'Collaborative and results-driven'}
+### 1. Audience-Centric Approach
+Understanding your ${answers.audience || 'audience'} is crucial for creating content that drives engagement and achieves your goal of ${answers.goal || 'building brand awareness'}.
 
-## Key Components
+### 2. Consistent Voice and Tone
+Maintaining a ${answers.tone || 'consistent'} voice across all content helps build trust and recognition with your audience.
 
-### 1. Strategic Framework
-Our approach focuses on delivering measurable outcomes that align with organizational priorities.
+### 3. Value-Driven Content
+Every piece of content should provide clear value to your ${answers.audience || 'readers'}, whether through education, entertainment, or inspiration.
 
-### 2. Implementation Plan
-A phased approach ensuring smooth execution and continuous improvement.
+## Content Strategy Framework
 
-### 3. Success Metrics
-Clear KPIs to track progress and ensure accountability.
+- **Research**: Deep dive into audience preferences and pain points
+- **Planning**: Develop content calendars aligned with business objectives
+- **Creation**: Produce high-quality, ${answers.tone || 'engaging'} content
+- **Distribution**: Share across relevant channels and platforms
+- **Analysis**: Measure performance and optimize for better results
 
 ## Conclusion
 
-This proposal represents a strategic opportunity to ${answers.goal || 'drive meaningful change'} while maintaining the highest standards of quality and professionalism.`;
+By focusing on ${answers.goal || 'your core objectives'} and maintaining a ${answers.tone || 'consistent'} approach, you can create content that truly connects with your ${answers.audience || 'audience'} and drives meaningful results.`;
+        break;
+      case 'master-prompts':
+        sampleOutput = `# Master Prompt Template: ${answers.goal || 'Advanced Content Creation'}
+
+## Prompt Structure Framework
+
+### Context Setting
+**Role Definition**: You are an expert ${answers.audience || 'content strategist'} with deep knowledge in creating ${answers.tone || 'professional'} content that achieves ${answers.goal || 'specific business objectives'}.
+
+### Task Specification
+**Primary Objective**: ${answers.goal || 'Create compelling content that drives engagement'}
+**Target Audience**: ${answers.audience || 'Professional stakeholders'}
+**Desired Tone**: ${answers.tone || 'Professional yet approachable'}
+
+### Detailed Instructions
+1. **Analysis Phase**
+   - Analyze the target audience's needs and preferences
+   - Identify key pain points and opportunities
+   - Research relevant trends and best practices
+
+2. **Creation Phase**
+   - Develop content that speaks directly to the ${answers.audience || 'audience'}
+   - Maintain a ${answers.tone || 'consistent'} voice throughout
+   - Focus on achieving the goal of ${answers.goal || 'maximum impact'}
+
+3. **Optimization Phase**
+   - Review content for clarity and engagement
+   - Ensure alignment with stated objectives
+   - Refine based on best practices
+
+### Output Requirements
+- **Format**: Structured, easy-to-read content
+- **Length**: Comprehensive yet concise
+- **Style**: ${answers.tone || 'Professional'} and engaging
+- **Focus**: Directly addresses ${answers.goal || 'stated objectives'}
+
+### Quality Checklist
+✅ Content addresses the specific goal: ${answers.goal || '[Goal]'}
+✅ Tone is appropriate for ${answers.audience || '[Audience]'}: ${answers.tone || '[Tone]'}
+✅ Information is accurate and valuable
+✅ Structure is logical and easy to follow
+✅ Call-to-action is clear and compelling
+
+## Usage Instructions
+This master prompt can be adapted for various content types by modifying the context, audience, and specific requirements while maintaining the core structure for consistent, high-quality outputs.`;
         break;
       default:
         sampleOutput = `# ${taskInfo?.title || 'Generated Content'}
