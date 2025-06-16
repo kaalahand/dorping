@@ -12,7 +12,9 @@ import {
   Star,
   Users,
   Clock,
-  Smile
+  Smile,
+  Menu,
+  X
 } from 'lucide-react';
 import SignupModal from './components/SignupModal';
 import AboutUs from './components/AboutUs';
@@ -28,6 +30,7 @@ function App() {
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showBlog, setShowBlog] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<{
     name: string;
     price: string;
@@ -55,6 +58,7 @@ function App() {
     if (pricingSection) {
       pricingSection.scrollIntoView({ behavior: 'smooth' });
     }
+    setIsMobileMenuOpen(false);
   };
 
   const handleSignupClick = (plan?: typeof plans[0]) => {
@@ -75,11 +79,13 @@ function App() {
       });
     }
     setIsSignupModalOpen(true);
+    setIsMobileMenuOpen(false);
   };
 
   // Function to handle blog navigation and scroll to top
   const handleBlogClick = () => {
     setShowBlog(true);
+    setIsMobileMenuOpen(false);
     // Scroll to top after state change
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -89,6 +95,7 @@ function App() {
   // Function to handle privacy page navigation and scroll to top
   const handlePrivacyClick = () => {
     setShowPrivacy(true);
+    setIsMobileMenuOpen(false);
     // Scroll to top after state change
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -98,10 +105,17 @@ function App() {
   // Function to handle terms page navigation and scroll to top
   const handleTermsClick = () => {
     setShowTerms(true);
+    setIsMobileMenuOpen(false);
     // Scroll to top after state change
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 0);
+  };
+
+  // Function to handle about us navigation
+  const handleAboutUsClick = () => {
+    setShowAboutUs(true);
+    setIsMobileMenuOpen(false);
   };
 
   const useCases = [
@@ -208,7 +222,8 @@ function App() {
       <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
+            {/* Logo */}
+            <div className="flex items-center space-x-2 flex-shrink-0">
               <img 
                 src="/Dorp_logo_v1 (1)-Photoroom.png" 
                 alt="Dorp AI Logo" 
@@ -216,9 +231,11 @@ function App() {
               />
               <span className="text-xl font-bold text-gray-900">Dorp AI</span>
             </div>
-            <div className="flex items-center space-x-4">
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-4">
               <button 
-                onClick={() => setShowAboutUs(true)}
+                onClick={handleAboutUsClick}
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 About Us
@@ -242,7 +259,53 @@ function App() {
                 Sign In
               </button>
             </div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </button>
+            </div>
           </div>
+
+          {/* Mobile Menu */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden border-t border-gray-200 bg-white">
+              <div className="px-2 pt-2 pb-3 space-y-1">
+                <button 
+                  onClick={handleAboutUsClick}
+                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                >
+                  About Us
+                </button>
+                <button 
+                  onClick={handleBlogClick}
+                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                >
+                  Blogs
+                </button>
+                <button 
+                  onClick={scrollToPricing}
+                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                >
+                  Pricing
+                </button>
+                <button 
+                  onClick={() => handleSignupClick()}
+                  className="block w-full text-left bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-base font-medium transition-colors mt-2"
+                >
+                  Sign In
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
@@ -539,7 +602,7 @@ function App() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
             <div className="flex items-center space-x-2">
               <img 
                 src="/Dorp_logo_v1 (1)-Photoroom.png" 
@@ -548,7 +611,7 @@ function App() {
               />
               <span className="text-xl font-bold">Dorp AI</span>
             </div>
-            <div className="flex space-x-6">
+            <div className="flex flex-wrap justify-center md:justify-end space-x-6">
               <button 
                 onClick={handlePrivacyClick}
                 className="text-gray-300 hover:text-white transition-colors"
