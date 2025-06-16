@@ -1,0 +1,34 @@
+# Robots.txt for Dorp AI
+# https://dorp.ai/robots.txt
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://dorp.ai/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Disallow admin areas (if any in future)
+Disallow: /admin/
+Disallow: /api/private/
+
+# Allow important pages
+Allow: /
+Allow: /about
+Allow: /blog
+Allow: /pricing
+Allow: /privacy-policy
+Allow: /terms-and-conditions
+Allow: /features
+Allow: /use-cases
+Allow: /support
+
+# Block sensitive files
+Disallow: /*.json$
+Disallow: /*.xml$ 
+Disallow: /sitemap.xml
+
+# Re-allow sitemap
+Allow: /sitemap.xml
