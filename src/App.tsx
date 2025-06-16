@@ -254,8 +254,8 @@ function App() {
     
     // Default homepage SEO
     return {
-      title: "Dorp AI - Transform Your Thoughts into Polished Action Instantly | AI Prompt Engineering",
-      description: "Transform your thoughts into polished, professional content instantly with Dorp AI. Our AI assistant asks the right questions and delivers clear, compelling drafts tailored to your needs. Start free with 50 prompts.",
+      title: "Dorp AI - Transform Your Thoughts into Reality Instantly | AI Prompt Engineering",
+      description: "We understand your prompt, ask the right followup question and deliver clear, compelling drafts tailored to your needs, so you can focus on what matters most. Start free with 50 prompts.",
       keywords: "AI prompt engineering, content generation, AI writing assistant, prompt templates, productivity tools, AI content creator, structured prompts, Dorps, artificial intelligence, content automation",
       canonicalUrl: "https://dorp.ai/"
     };
@@ -400,11 +400,11 @@ function App() {
               <div>
                 <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
                   Transform Your Thoughts into 
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"> Polished Action</span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"> Reality</span>
                   —Instantly
                 </h1>
                 <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                  Our AI assistant asks the right questions and delivers clear, compelling drafts tailored to your needs, so you can focus on what matters most.
+                  We understand your prompt, ask the right followup question and deliver clear, compelling drafts tailored to your needs, so you can focus on what matters most.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <button 
