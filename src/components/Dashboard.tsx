@@ -22,7 +22,15 @@ import {
   Sparkles,
   Target,
   Users,
-  Palette
+  Palette,
+  Send,
+  Copy,
+  Download,
+  ExternalLink,
+  RefreshCw,
+  ThumbsUp,
+  ThumbsDown,
+  Edit3
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -35,8 +43,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [userPrompt, setUserPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [showQuestions, setShowQuestions] = useState(false);
+  const [showFinalOutput, setShowFinalOutput] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(true);
+  const [chatMessage, setChatMessage] = useState('');
+  const [chatHistory, setChatHistory] = useState<Array<{id: number, message: string, sender: 'user' | 'ai', timestamp: Date}>>([]);
+  const [generatedOutput, setGeneratedOutput] = useState('');
+  const [isGeneratingFinal, setIsGeneratingFinal] = useState(false);
   const [answers, setAnswers] = useState({
     goal: '',
     audience: '',
@@ -139,6 +152,128 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     setOnboardingChecklist(prev => ({ ...prev, createPrompt: true }));
   };
 
+  const handleGenerateFinalOutput = async () => {
+    setIsGeneratingFinal(true);
+    
+    // Simulate API call for final output generation
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    // Generate sample output based on selected task
+    const taskInfo = getSelectedTaskInfo();
+    let sampleOutput = '';
+    
+    switch (selectedTask) {
+      case 'email':
+        sampleOutput = `Subject: ${answers.goal || 'Follow-up on Our Discussion'}
+
+Dear [Recipient],
+
+I hope this email finds you well. I wanted to follow up on our recent conversation and provide you with the information we discussed.
+
+Based on our discussion, I understand that you're looking for a solution that addresses your specific needs while maintaining the ${answers.tone || 'professional'} approach that works best for your ${answers.audience || 'team'}.
+
+I've prepared a comprehensive overview that outlines:
+• Key benefits and features
+• Implementation timeline
+• Next steps for moving forward
+
+I believe this approach aligns perfectly with your goals of ${answers.goal || 'improving efficiency and collaboration'}.
+
+Would you be available for a brief call this week to discuss the details? I'm confident we can create a solution that exceeds your expectations.
+
+Best regards,
+[Your Name]`;
+        break;
+      case 'document':
+        sampleOutput = `# ${answers.goal || 'Project Proposal'}
+
+## Executive Summary
+
+This document outlines a comprehensive approach to ${answers.goal || 'achieving our strategic objectives'} while maintaining a ${answers.tone || 'professional'} standard that resonates with our ${answers.audience || 'stakeholders'}.
+
+## Objectives
+
+- Primary Goal: ${answers.goal || 'Deliver exceptional results'}
+- Target Audience: ${answers.audience || 'Key stakeholders and team members'}
+- Approach: ${answers.tone || 'Collaborative and results-driven'}
+
+## Key Components
+
+### 1. Strategic Framework
+Our approach focuses on delivering measurable outcomes that align with organizational priorities.
+
+### 2. Implementation Plan
+A phased approach ensuring smooth execution and continuous improvement.
+
+### 3. Success Metrics
+Clear KPIs to track progress and ensure accountability.
+
+## Conclusion
+
+This proposal represents a strategic opportunity to ${answers.goal || 'drive meaningful change'} while maintaining the highest standards of quality and professionalism.`;
+        break;
+      default:
+        sampleOutput = `# ${taskInfo?.title || 'Generated Content'}
+
+## Overview
+
+Based on your requirements, I've created content that aims to ${answers.goal || 'meet your specific objectives'} while maintaining a ${answers.tone || 'appropriate'} tone for your ${answers.audience || 'intended audience'}.
+
+## Key Points
+
+• Tailored specifically for your ${answers.audience || 'target audience'}
+• Maintains a ${answers.tone || 'professional'} tone throughout
+• Focuses on achieving your goal of ${answers.goal || 'delivering value'}
+
+## Content
+
+${userPrompt}
+
+This content has been optimized to resonate with your audience while achieving your stated objectives. The tone and style have been carefully crafted to ensure maximum impact and engagement.
+
+## Next Steps
+
+Feel free to modify, expand, or adapt this content to better suit your specific needs. You can also use the chat feature to request adjustments or ask questions about the generated content.`;
+    }
+    
+    setGeneratedOutput(sampleOutput);
+    setIsGeneratingFinal(false);
+    setShowFinalOutput(true);
+    
+    // Add initial AI message to chat
+    setChatHistory([{
+      id: 1,
+      message: "I've generated your content! Feel free to ask me to modify anything or explain my approach. What would you like to adjust?",
+      sender: 'ai',
+      timestamp: new Date()
+    }]);
+  };
+
+  const handleSendChatMessage = () => {
+    if (!chatMessage.trim()) return;
+    
+    const newMessage = {
+      id: chatHistory.length + 1,
+      message: chatMessage,
+      sender: 'user' as const,
+      timestamp: new Date()
+    };
+    
+    setChatHistory(prev => [...prev, newMessage]);
+    setChatMessage('');
+    
+    // Simulate AI response
+    setTimeout(() => {
+      const aiResponse = {
+        id: chatHistory.length + 2,
+        message: "I understand your request. Let me help you with that modification. Would you like me to adjust the tone, add more details, or change the structure?",
+        sender: 'ai' as const,
+        timestamp: new Date()
+      };
+      setChatHistory(prev => [...prev, aiResponse]);
+    }, 1000);
+  };
+
   const handleAnswerChange = (field: string, value: string) => {
     setAnswers(prev => ({ ...prev, [field]: value }));
   };
@@ -152,7 +287,30 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     setSelectedTask(null);
     setUserPrompt('');
     setShowQuestions(false);
+    setShowFinalOutput(false);
     setAnswers({ goal: '', audience: '', tone: '' });
+    setChatHistory([]);
+    setGeneratedOutput('');
+  };
+
+  const handleCopyOutput = () => {
+    navigator.clipboard.writeText(generatedOutput);
+    // You could add a toast notification here
+  };
+
+  const handleDownloadOutput = () => {
+    const element = document.createElement('a');
+    const file = new Blob([generatedOutput], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = `${getSelectedTaskInfo()?.title || 'content'}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const handleExportOutput = () => {
+    // This would integrate with external services like Google Docs, etc.
+    console.log('Export to external service');
   };
 
   return (
@@ -312,7 +470,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
         {/* Prompt Studio Content */}
         <main className="flex-1 p-6">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             {/* Step Indicator */}
             <div className="flex items-center justify-center mb-8">
               <div className="flex items-center space-x-4">
@@ -336,176 +494,392 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             </div>
 
             {/* Step Content */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              {/* Step 1: Select Task */}
-              {currentStep === 1 && (
-                <div>
-                  <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-4">Select Your Task</h2>
-                    <p className="text-gray-600">Choose what you'd like to create today</p>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {tasks.map((task) => (
-                      <button
-                        key={task.id}
-                        onClick={() => handleTaskSelect(task.id)}
-                        className={`bg-gradient-to-r ${task.color} text-white p-6 rounded-xl hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl group`}
-                      >
-                        <div className="flex flex-col items-center text-center">
-                          <div className="mb-3 group-hover:scale-110 transition-transform">
-                            {task.icon}
+            {!showFinalOutput ? (
+              <div className="bg-white rounded-2xl shadow-lg p-8">
+                {/* Step 1: Select Task */}
+                {currentStep === 1 && (
+                  <div>
+                    <div className="text-center mb-8">
+                      <h2 className="text-3xl font-bold text-gray-900 mb-4">Select Your Task</h2>
+                      <p className="text-gray-600">Choose what you'd like to create today</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {tasks.map((task) => (
+                        <button
+                          key={task.id}
+                          onClick={() => handleTaskSelect(task.id)}
+                          className={`bg-gradient-to-r ${task.color} text-white p-6 rounded-xl hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl group`}
+                        >
+                          <div className="flex flex-col items-center text-center">
+                            <div className="mb-3 group-hover:scale-110 transition-transform">
+                              {task.icon}
+                            </div>
+                            <h3 className="font-semibold mb-2">{task.title}</h3>
+                            <p className="text-xs opacity-90">{task.description}</p>
                           </div>
-                          <h3 className="font-semibold mb-2">{task.title}</h3>
-                          <p className="text-xs opacity-90">{task.description}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Step 2: Enter Instruction */}
-              {currentStep === 2 && selectedTask && (
-                <div>
-                  <div className="text-center mb-8">
-                    <div className="flex items-center justify-center mb-4">
-                      <div className={`bg-gradient-to-r ${getSelectedTaskInfo()?.color} p-3 rounded-lg text-white mr-4`}>
-                        {getSelectedTaskInfo()?.icon}
-                      </div>
-                      <div className="text-left">
-                        <h2 className="text-3xl font-bold text-gray-900">{getSelectedTaskInfo()?.title}</h2>
-                        <p className="text-gray-600">{getSelectedTaskInfo()?.description}</p>
-                      </div>
+                        </button>
+                      ))}
                     </div>
                   </div>
+                )}
 
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block text-lg font-semibold text-gray-900 mb-3">
-                        What would you like to create?
-                      </label>
-                      <textarea
-                        value={userPrompt}
-                        onChange={(e) => setUserPrompt(e.target.value)}
-                        placeholder="Describe what you want to create. Be as specific or general as you'd like - our AI will ask follow-up questions to get the details right."
-                        className="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-lg"
-                      />
-                      <div className="flex justify-between items-center mt-2">
-                        <p className="text-sm text-gray-500">
-                          {userPrompt.length}/500 characters
-                        </p>
+                {/* Step 2: Enter Instruction */}
+                {currentStep === 2 && selectedTask && (
+                  <div>
+                    <div className="text-center mb-8">
+                      <div className="flex items-center justify-center mb-4">
+                        <div className={`bg-gradient-to-r ${getSelectedTaskInfo()?.color} p-3 rounded-lg text-white mr-4`}>
+                          {getSelectedTaskInfo()?.icon}
+                        </div>
+                        <div className="text-left">
+                          <h2 className="text-3xl font-bold text-gray-900">{getSelectedTaskInfo()?.title}</h2>
+                          <p className="text-gray-600">{getSelectedTaskInfo()?.description}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div>
+                        <label className="block text-lg font-semibold text-gray-900 mb-3">
+                          What would you like to create?
+                        </label>
+                        <textarea
+                          value={userPrompt}
+                          onChange={(e) => setUserPrompt(e.target.value)}
+                          placeholder="Describe what you want to create. Be as specific or general as you'd like - our AI will ask follow-up questions to get the details right."
+                          className="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-lg"
+                        />
+                        <div className="flex justify-between items-center mt-2">
+                          <p className="text-sm text-gray-500">
+                            {userPrompt.length}/500 characters
+                          </p>
+                          <button
+                            onClick={resetWizard}
+                            className="text-sm text-gray-500 hover:text-gray-700 underline"
+                          >
+                            Start Over
+                          </button>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={handleGenerateOutput}
+                        disabled={!userPrompt.trim() || isGenerating}
+                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 px-6 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
+                      >
+                        {isGenerating ? (
+                          <>
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                            Generating Questions...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-5 h-5 mr-2" />
+                            Generate Output
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 3: Answer Questions */}
+                {currentStep === 3 && showQuestions && (
+                  <div>
+                    <div className="text-center mb-8">
+                      <h2 className="text-3xl font-bold text-gray-900 mb-4">Perfect Your Output</h2>
+                      <p className="text-gray-600">Answer these questions to get exactly what you need</p>
+                    </div>
+
+                    <div className="space-y-6">
+                      {/* Goal Question */}
+                      <div className="bg-gray-50 rounded-lg p-6">
+                        <div className="flex items-center mb-4">
+                          <Target className="w-6 h-6 text-blue-500 mr-3" />
+                          <label className="text-lg font-semibold text-gray-900">
+                            💭 What's the goal?
+                          </label>
+                        </div>
+                        <textarea
+                          value={answers.goal}
+                          onChange={(e) => handleAnswerChange('goal', e.target.value)}
+                          placeholder="What do you want to achieve with this content? (e.g., persuade, inform, entertain)"
+                          className="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                          maxLength={500}
+                        />
+                        <p className="text-sm text-gray-500 mt-1">{answers.goal.length}/500 words</p>
+                      </div>
+
+                      {/* Audience Question */}
+                      <div className="bg-gray-50 rounded-lg p-6">
+                        <div className="flex items-center mb-4">
+                          <Users className="w-6 h-6 text-green-500 mr-3" />
+                          <label className="text-lg font-semibold text-gray-900">
+                            🎯 Who's the audience?
+                          </label>
+                        </div>
+                        <textarea
+                          value={answers.audience}
+                          onChange={(e) => handleAnswerChange('audience', e.target.value)}
+                          placeholder="Who will be reading this? (e.g., colleagues, customers, friends, specific demographics)"
+                          className="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                          maxLength={500}
+                        />
+                        <p className="text-sm text-gray-500 mt-1">{answers.audience.length}/500 words</p>
+                      </div>
+
+                      {/* Tone Question */}
+                      <div className="bg-gray-50 rounded-lg p-6">
+                        <div className="flex items-center mb-4">
+                          <Palette className="w-6 h-6 text-purple-500 mr-3" />
+                          <label className="text-lg font-semibold text-gray-900">
+                            📝 What's the tone?
+                          </label>
+                        </div>
+                        <textarea
+                          value={answers.tone}
+                          onChange={(e) => handleAnswerChange('tone', e.target.value)}
+                          placeholder="How should this sound? (e.g., professional, casual, friendly, authoritative, humorous)"
+                          className="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                          maxLength={500}
+                        />
+                        <p className="text-sm text-gray-500 mt-1">{answers.tone.length}/500 words</p>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex space-x-4">
                         <button
                           onClick={resetWizard}
-                          className="text-sm text-gray-500 hover:text-gray-700 underline"
+                          className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-medium transition-colors"
                         >
                           Start Over
                         </button>
+                        <button
+                          onClick={handleGenerateFinalOutput}
+                          disabled={isGeneratingFinal}
+                          className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
+                        >
+                          {isGeneratingFinal ? (
+                            <>
+                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                              Generating Final Output...
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="w-5 h-5 mr-2" />
+                              Generate Final Output
+                            </>
+                          )}
+                        </button>
                       </div>
                     </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Final Output Split View */
+              <div className="grid lg:grid-cols-2 gap-6 h-[calc(100vh-200px)]">
+                {/* Left Panel - Task Summary and Chat */}
+                <div className="bg-white rounded-2xl shadow-lg flex flex-col">
+                  {/* Task Summary Header */}
+                  <div className="p-6 border-b border-gray-200">
+                    <div className="flex items-center mb-4">
+                      <div className={`bg-gradient-to-r ${getSelectedTaskInfo()?.color} p-3 rounded-lg text-white mr-4`}>
+                        {getSelectedTaskInfo()?.icon}
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900">{getSelectedTaskInfo()?.title}</h3>
+                        <p className="text-gray-600">Your prompt session</p>
+                      </div>
+                    </div>
+                    
+                    {/* Task Details */}
+                    <div className="space-y-3">
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <h4 className="font-semibold text-gray-900 mb-1">Original Request:</h4>
+                        <p className="text-sm text-gray-700">{userPrompt}</p>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 gap-2">
+                        {answers.goal && (
+                          <div className="bg-blue-50 rounded-lg p-2">
+                            <span className="text-xs font-semibold text-blue-700">Goal:</span>
+                            <p className="text-xs text-blue-600">{answers.goal}</p>
+                          </div>
+                        )}
+                        {answers.audience && (
+                          <div className="bg-green-50 rounded-lg p-2">
+                            <span className="text-xs font-semibold text-green-700">Audience:</span>
+                            <p className="text-xs text-green-600">{answers.audience}</p>
+                          </div>
+                        )}
+                        {answers.tone && (
+                          <div className="bg-purple-50 rounded-lg p-2">
+                            <span className="text-xs font-semibold text-purple-700">Tone:</span>
+                            <p className="text-xs text-purple-600">{answers.tone}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
 
-                    <button
-                      onClick={handleGenerateOutput}
-                      disabled={!userPrompt.trim() || isGenerating}
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 px-6 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
-                    >
-                      {isGenerating ? (
-                        <>
-                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                          Generating Questions...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-5 h-5 mr-2" />
-                          Generate Output
-                        </>
-                      )}
-                    </button>
+                  {/* Chat Section */}
+                  <div className="flex-1 flex flex-col">
+                    <div className="p-4 border-b border-gray-200">
+                      <h4 className="font-semibold text-gray-900">Chat with AI</h4>
+                      <p className="text-sm text-gray-600">Ask questions or request modifications</p>
+                    </div>
+                    
+                    {/* Chat Messages */}
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                      {chatHistory.map((message) => (
+                        <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                          <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                            message.sender === 'user' 
+                              ? 'bg-blue-500 text-white' 
+                              : 'bg-gray-100 text-gray-900'
+                          }`}>
+                            <p className="text-sm">{message.message}</p>
+                            <p className={`text-xs mt-1 ${
+                              message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
+                            }`}>
+                              {message.timestamp.toLocaleTimeString()}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Chat Input */}
+                    <div className="p-4 border-t border-gray-200">
+                      <div className="flex space-x-2">
+                        <input
+                          type="text"
+                          value={chatMessage}
+                          onChange={(e) => setChatMessage(e.target.value)}
+                          placeholder="Ask for modifications or improvements..."
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          onKeyPress={(e) => e.key === 'Enter' && handleSendChatMessage()}
+                        />
+                        <button
+                          onClick={handleSendChatMessage}
+                          disabled={!chatMessage.trim()}
+                          className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Send className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              )}
 
-              {/* Step 3: Answer Questions */}
-              {currentStep === 3 && showQuestions && (
-                <div>
-                  <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-4">Perfect Your Output</h2>
-                    <p className="text-gray-600">Answer these questions to get exactly what you need</p>
-                  </div>
-
-                  <div className="space-y-6">
-                    {/* Goal Question */}
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <div className="flex items-center mb-4">
-                        <Target className="w-6 h-6 text-blue-500 mr-3" />
-                        <label className="text-lg font-semibold text-gray-900">
-                          💭 What's the goal?
-                        </label>
+                {/* Right Panel - Generated Output */}
+                <div className="bg-white rounded-2xl shadow-lg flex flex-col">
+                  {/* Output Header */}
+                  <div className="p-6 border-b border-gray-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900">Generated Output</h3>
+                        <p className="text-gray-600">Your polished content is ready</p>
                       </div>
-                      <textarea
-                        value={answers.goal}
-                        onChange={(e) => handleAnswerChange('goal', e.target.value)}
-                        placeholder="What do you want to achieve with this content? (e.g., persuade, inform, entertain)"
-                        className="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                        maxLength={500}
-                      />
-                      <p className="text-sm text-gray-500 mt-1">{answers.goal.length}/500 words</p>
-                    </div>
-
-                    {/* Audience Question */}
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <div className="flex items-center mb-4">
-                        <Users className="w-6 h-6 text-green-500 mr-3" />
-                        <label className="text-lg font-semibold text-gray-900">
-                          🎯 Who's the audience?
-                        </label>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => {/* Regenerate logic */}}
+                          className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                          title="Regenerate"
+                        >
+                          <RefreshCw className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => {/* Edit logic */}}
+                          className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                          title="Edit"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
                       </div>
-                      <textarea
-                        value={answers.audience}
-                        onChange={(e) => handleAnswerChange('audience', e.target.value)}
-                        placeholder="Who will be reading this? (e.g., colleagues, customers, friends, specific demographics)"
-                        className="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                        maxLength={500}
-                      />
-                      <p className="text-sm text-gray-500 mt-1">{answers.audience.length}/500 words</p>
                     </div>
-
-                    {/* Tone Question */}
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <div className="flex items-center mb-4">
-                        <Palette className="w-6 h-6 text-purple-500 mr-3" />
-                        <label className="text-lg font-semibold text-gray-900">
-                          📝 What's the tone?
-                        </label>
-                      </div>
-                      <textarea
-                        value={answers.tone}
-                        onChange={(e) => handleAnswerChange('tone', e.target.value)}
-                        placeholder="How should this sound? (e.g., professional, casual, friendly, authoritative, humorous)"
-                        className="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                        maxLength={500}
-                      />
-                      <p className="text-sm text-gray-500 mt-1">{answers.tone.length}/500 words</p>
-                    </div>
-
+                    
                     {/* Action Buttons */}
-                    <div className="flex space-x-4">
+                    <div className="flex space-x-2">
                       <button
-                        onClick={resetWizard}
-                        className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-medium transition-colors"
+                        onClick={handleCopyOutput}
+                        className="flex-1 bg-blue-100 text-blue-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors flex items-center justify-center"
                       >
-                        Start Over
+                        <Copy className="w-4 h-4 mr-1" />
+                        Copy
                       </button>
                       <button
-                        className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105"
+                        onClick={handleDownloadOutput}
+                        className="flex-1 bg-green-100 text-green-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-green-200 transition-colors flex items-center justify-center"
                       >
-                        Generate Final Output
+                        <Download className="w-4 h-4 mr-1" />
+                        Download
+                      </button>
+                      <button
+                        onClick={handleExportOutput}
+                        className="flex-1 bg-purple-100 text-purple-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-purple-200 transition-colors flex items-center justify-center"
+                      >
+                        <ExternalLink className="w-4 h-4 mr-1" />
+                        Export
                       </button>
                     </div>
                   </div>
+
+                  {/* Output Content */}
+                  <div className="flex-1 overflow-y-auto p-6">
+                    <div className="prose prose-sm max-w-none">
+                      <pre className="whitespace-pre-wrap font-sans text-gray-900 leading-relaxed">
+                        {generatedOutput}
+                      </pre>
+                    </div>
+                  </div>
+
+                  {/* Rating Section */}
+                  <div className="p-6 border-t border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-semibold text-gray-900">Rate this output</h4>
+                        <p className="text-sm text-gray-600">Help us improve our AI</p>
+                      </div>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => {
+                            setOnboardingChecklist(prev => ({ ...prev, ratePrompt: true }));
+                          }}
+                          className="p-2 text-gray-400 hover:text-green-500 transition-colors"
+                          title="Good output"
+                        >
+                          <ThumbsUp className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setOnboardingChecklist(prev => ({ ...prev, ratePrompt: true }));
+                          }}
+                          className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                          title="Needs improvement"
+                        >
+                          <ThumbsDown className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+
+            {/* Start Over Button for Final Output */}
+            {showFinalOutput && (
+              <div className="mt-6 text-center">
+                <button
+                  onClick={resetWizard}
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-medium transition-colors"
+                >
+                  Create Another Prompt
+                </button>
+              </div>
+            )}
           </div>
         </main>
 
