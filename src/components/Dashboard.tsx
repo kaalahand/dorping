@@ -34,16 +34,14 @@ import {
   Save,
   Search,
   Filter,
-  Calendar,
-  Clock,
-  Play,
+  Grid,
+  List,
   Star,
   Trash2,
-  MoreVertical,
-  SortDesc,
-  SortAsc,
-  Grid,
-  List
+  Play,
+  Calendar,
+  Clock,
+  Tag
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -81,24 +79,22 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [chatHistory, setChatHistory] = useState<Array<{id: number, message: string, sender: 'user' | 'ai', timestamp: Date}>>([]);
   const [generatedOutput, setGeneratedOutput] = useState('');
   const [isGeneratingFinal, setIsGeneratingFinal] = useState(false);
+  const [activeSection, setActiveSection] = useState('create');
+  const [copySuccess, setCopySuccess] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [promptName, setPromptName] = useState('');
+  const [savedPrompts, setSavedPrompts] = useState<SavedPrompt[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTaskFilter, setSelectedTaskFilter] = useState('all');
+  const [selectedTimeFilter, setSelectedTimeFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('newest');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showFilters, setShowFilters] = useState(false);
   const [answers, setAnswers] = useState({
     goal: '',
     audience: '',
     tone: ''
   });
-  const [showSaveModal, setShowSaveModal] = useState(false);
-  const [promptName, setPromptName] = useState('');
-  const [showCopySuccess, setShowCopySuccess] = useState(false);
-  const [activeView, setActiveView] = useState<'create' | 'history' | 'marketplace' | 'analytics'>('create');
-
-  // Prompt Repository State
-  const [savedPrompts, setSavedPrompts] = useState<SavedPrompt[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTaskFilter, setSelectedTaskFilter] = useState<string>('all');
-  const [selectedTimeFilter, setSelectedTimeFilter] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name' | 'lastUsed'>('newest');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showFilters, setShowFilters] = useState(false);
 
   // Onboarding checklist state
   const [onboardingChecklist, setOnboardingChecklist] = useState({
@@ -117,14 +113,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       description: 'Professional emails, follow-ups, and communications'
     },
     {
-      id: 'content',
+      id: 'document',
       title: 'Create Content',
       icon: <FileText className="w-6 h-6" />,
       color: 'from-purple-500 to-purple-600',
       description: 'Reports, proposals, and structured documents'
     },
     {
-      id: 'master-prompts',
+      id: 'creative',
       title: 'Create Master Prompts',
       icon: <Lightbulb className="w-6 h-6" />,
       color: 'from-green-500 to-green-600',
@@ -145,7 +141,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       description: 'Programming, scripts, and technical documentation'
     },
     {
-      id: 'content-creation',
+      id: 'content',
       title: 'Content Creation',
       icon: <PenTool className="w-6 h-6" />,
       color: 'from-pink-500 to-pink-600',
@@ -168,162 +164,101 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   ];
 
   const navigationItems = [
-    { id: 'create', icon: <Plus className="w-6 h-6" />, label: 'Create Prompt', active: activeView === 'create' },
-    { id: 'history', icon: <History className="w-6 h-6" />, label: 'My Prompts', active: activeView === 'history' },
-    { id: 'marketplace', icon: <Store className="w-6 h-6" />, label: 'Marketplace', isPro: true, active: activeView === 'marketplace' },
-    { id: 'analytics', icon: <BarChart3 className="w-6 h-6" />, label: 'Analytics', isPro: true, active: activeView === 'analytics' },
+    { id: 'create', icon: <Plus className="w-6 h-6" />, label: 'Create Prompt', active: activeSection === 'create' },
+    { id: 'history', icon: <History className="w-6 h-6" />, label: 'My Prompts', active: activeSection === 'history' },
+    { id: 'marketplace', icon: <Store className="w-6 h-6" />, label: 'Marketplace', isPro: true },
+    { id: 'analytics', icon: <BarChart3 className="w-6 h-6" />, label: 'Analytics', isPro: true },
     { id: 'upgrade', icon: <Crown className="w-6 h-6" />, label: 'Upgrade', isUpgrade: true }
   ];
 
-  const timeFilters = [
-    { id: 'all', label: 'All Time' },
-    { id: '24h', label: 'Last 24 Hours' },
-    { id: '7d', label: 'Last 7 Days' },
-    { id: '30d', label: 'Last 30 Days' },
-    { id: '90d', label: 'Last 90 Days' }
-  ];
-
-  // Initialize with sample data
+  // Initialize with sample saved prompts
   useEffect(() => {
     const samplePrompts: SavedPrompt[] = [
       {
         id: '1',
-        name: 'Write-Email-follow-up-meeting-Jan-15-2025',
-        taskType: 'Write Email',
-        taskIcon: <Mail className="w-5 h-5" />,
+        name: 'Email-Follow up meeting-2025-01-15',
+        taskType: 'email',
+        taskIcon: <Mail className="w-4 h-4" />,
         taskColor: 'from-blue-500 to-blue-600',
         originalPrompt: 'Write a follow-up email after our product demo meeting',
         goal: 'Schedule next steps and address any concerns',
         audience: 'Potential enterprise client',
         tone: 'Professional and consultative',
-        generatedOutput: 'Subject: Thank you for your time - Next steps for [Company Name]...',
+        generatedOutput: 'Subject: Thank you for your time - Next steps...',
         createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
         lastUsed: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
         rating: 5,
-        tags: ['sales', 'follow-up', 'enterprise'],
+        tags: ['follow-up', 'enterprise', 'demo'],
         isFavorite: true
       },
       {
         id: '2',
-        name: 'Create-Content-blog-post-ai-trends',
-        taskType: 'Create Content',
-        taskIcon: <FileText className="w-5 h-5" />,
-        taskColor: 'from-purple-500 to-purple-600',
-        originalPrompt: 'Create a blog post about AI trends in 2025',
-        goal: 'Educate readers about emerging AI technologies',
-        audience: 'Tech professionals and business leaders',
-        tone: 'Informative and engaging',
-        generatedOutput: '# The Future of AI: 5 Trends That Will Shape 2025...',
-        createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+        name: 'Content-Blog post about AI trends-2025-01-14',
+        taskType: 'content',
+        taskIcon: <PenTool className="w-4 h-4" />,
+        taskColor: 'from-pink-500 to-pink-600',
+        originalPrompt: 'Create a blog post about emerging AI trends in 2025',
+        goal: 'Educate readers about latest AI developments',
+        audience: 'Tech professionals and enthusiasts',
+        tone: 'Informative yet engaging',
+        generatedOutput: '# The Future of AI: 5 Trends Shaping 2025...',
+        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
         rating: 4,
-        tags: ['blog', 'ai', 'trends', 'technology'],
+        tags: ['AI', 'trends', 'blog', '2025'],
         isFavorite: false
       },
       {
         id: '3',
-        name: 'Master-Prompts-creative-writing-workshop',
-        taskType: 'Create Master Prompts',
-        taskIcon: <Lightbulb className="w-5 h-5" />,
+        name: 'Master Prompt-Creative writing assistant-2025-01-13',
+        taskType: 'creative',
+        taskIcon: <Lightbulb className="w-4 h-4" />,
         taskColor: 'from-green-500 to-green-600',
-        originalPrompt: 'Generate creative writing prompts for a workshop',
-        goal: 'Inspire creativity and overcome writer\'s block',
-        audience: 'Aspiring writers and students',
+        originalPrompt: 'Create a master prompt for generating creative story ideas',
+        goal: 'Help writers overcome creative blocks',
+        audience: 'Fiction writers and storytellers',
         tone: 'Inspiring and imaginative',
-        generatedOutput: '1. Write about a world where colors have sounds...',
-        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+        generatedOutput: 'You are a creative writing assistant specialized in...',
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+        lastUsed: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
         rating: 5,
-        tags: ['creative', 'writing', 'workshop', 'inspiration'],
+        tags: ['creative', 'writing', 'master-prompt'],
         isFavorite: true
       },
       {
         id: '4',
-        name: 'Business-Strategy-market-analysis-report',
-        taskType: 'Business Strategy',
-        taskIcon: <Briefcase className="w-5 h-5" />,
+        name: 'Business-Quarterly review presentation-2025-01-10',
+        taskType: 'business',
+        taskIcon: <Briefcase className="w-4 h-4" />,
         taskColor: 'from-red-500 to-red-600',
-        originalPrompt: 'Create a market analysis report for our new product launch',
-        goal: 'Identify market opportunities and competitive landscape',
-        audience: 'Executive team and investors',
+        originalPrompt: 'Create an outline for Q4 business review presentation',
+        goal: 'Present quarterly results to stakeholders',
+        audience: 'Board members and investors',
         tone: 'Professional and data-driven',
-        generatedOutput: '# Market Analysis Report: Q1 2025 Product Launch...',
-        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
+        generatedOutput: '# Q4 2024 Business Review\n\n## Executive Summary...',
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
         rating: 4,
-        tags: ['business', 'strategy', 'market-analysis', 'report'],
+        tags: ['business', 'quarterly', 'presentation'],
         isFavorite: false
       },
       {
         id: '5',
-        name: 'Code-Review-python-optimization',
-        taskType: 'Write Code',
-        taskIcon: <Code className="w-5 h-5" />,
+        name: 'Code-React component documentation-2025-01-08',
+        taskType: 'code',
+        taskIcon: <Code className="w-4 h-4" />,
         taskColor: 'from-indigo-500 to-indigo-600',
-        originalPrompt: 'Review and optimize this Python data processing script',
-        goal: 'Improve performance and code readability',
-        audience: 'Development team',
-        tone: 'Technical and constructive',
-        generatedOutput: '# Code Review and Optimization Suggestions...',
-        createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 2 weeks ago
+        originalPrompt: 'Generate documentation for a React component library',
+        goal: 'Create comprehensive developer documentation',
+        audience: 'Frontend developers',
+        tone: 'Technical and clear',
+        generatedOutput: '# Component Library Documentation\n\n## Installation...',
+        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
         rating: 5,
-        tags: ['code', 'python', 'optimization', 'review'],
+        tags: ['code', 'react', 'documentation'],
         isFavorite: true
       }
     ];
     setSavedPrompts(samplePrompts);
   }, []);
-
-  // Filter and search prompts
-  const filteredPrompts = savedPrompts.filter(prompt => {
-    // Search filter
-    const matchesSearch = searchQuery === '' || 
-      prompt.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      prompt.originalPrompt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      prompt.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-
-    // Task type filter
-    const matchesTaskType = selectedTaskFilter === 'all' || prompt.taskType === selectedTaskFilter;
-
-    // Time filter
-    const now = new Date();
-    const promptDate = prompt.createdAt;
-    let matchesTime = true;
-
-    switch (selectedTimeFilter) {
-      case '24h':
-        matchesTime = (now.getTime() - promptDate.getTime()) <= 24 * 60 * 60 * 1000;
-        break;
-      case '7d':
-        matchesTime = (now.getTime() - promptDate.getTime()) <= 7 * 24 * 60 * 60 * 1000;
-        break;
-      case '30d':
-        matchesTime = (now.getTime() - promptDate.getTime()) <= 30 * 24 * 60 * 60 * 1000;
-        break;
-      case '90d':
-        matchesTime = (now.getTime() - promptDate.getTime()) <= 90 * 24 * 60 * 60 * 1000;
-        break;
-      default:
-        matchesTime = true;
-    }
-
-    return matchesSearch && matchesTaskType && matchesTime;
-  });
-
-  // Sort prompts
-  const sortedPrompts = [...filteredPrompts].sort((a, b) => {
-    switch (sortBy) {
-      case 'newest':
-        return b.createdAt.getTime() - a.createdAt.getTime();
-      case 'oldest':
-        return a.createdAt.getTime() - b.createdAt.getTime();
-      case 'name':
-        return a.name.localeCompare(b.name);
-      case 'lastUsed':
-        const aLastUsed = a.lastUsed || a.createdAt;
-        const bLastUsed = b.lastUsed || b.createdAt;
-        return bLastUsed.getTime() - aLastUsed.getTime();
-      default:
-        return 0;
-    }
-  });
 
   const handleTaskSelect = (taskId: string) => {
     setSelectedTask(taskId);
@@ -378,7 +313,7 @@ Would you be available for a brief call this week to discuss the details? I'm co
 Best regards,
 [Your Name]`;
         break;
-      case 'content':
+      case 'document':
         sampleOutput = `# ${answers.goal || 'Project Proposal'}
 
 ## Executive Summary
@@ -487,10 +422,14 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
     setGeneratedOutput('');
   };
 
-  const handleCopyOutput = () => {
-    navigator.clipboard.writeText(generatedOutput);
-    setShowCopySuccess(true);
-    setTimeout(() => setShowCopySuccess(false), 2000);
+  const handleCopyOutput = async () => {
+    try {
+      await navigator.clipboard.writeText(generatedOutput);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
   };
 
   const handleDownloadOutput = () => {
@@ -508,35 +447,25 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
     console.log('Export to external service');
   };
 
-  const generateDefaultPromptName = () => {
-    const taskInfo = getSelectedTaskInfo();
-    const taskType = taskInfo?.title.replace(/\s+/g, '-') || 'Prompt';
-    const summary = userPrompt.slice(0, 30).replace(/[^\w\s]/g, '').replace(/\s+/g, '-').toLowerCase();
-    const date = new Date().toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
-    }).replace(/[\s,]/g, '-');
-    
-    return `${taskType}-${summary}-${date}`;
-  };
-
   const handleSavePrompt = () => {
-    const defaultName = generateDefaultPromptName();
+    if (!selectedTask || !userPrompt.trim()) return;
+    
+    const taskInfo = getSelectedTaskInfo();
+    const defaultName = `${taskInfo?.title}-${userPrompt.slice(0, 30).replace(/[^a-zA-Z0-9]/g, ' ').trim()}-${new Date().toISOString().split('T')[0]}`;
     setPromptName(defaultName);
     setShowSaveModal(true);
   };
 
-  const handleSaveConfirm = () => {
+  const confirmSavePrompt = () => {
+    if (!selectedTask || !userPrompt.trim()) return;
+    
     const taskInfo = getSelectedTaskInfo();
-    if (!taskInfo) return;
-
     const newPrompt: SavedPrompt = {
       id: Date.now().toString(),
-      name: promptName || generateDefaultPromptName(),
-      taskType: taskInfo.title,
-      taskIcon: taskInfo.icon,
-      taskColor: taskInfo.color,
+      name: promptName || `${taskInfo?.title}-${userPrompt.slice(0, 30)}-${new Date().toISOString().split('T')[0]}`,
+      taskType: selectedTask,
+      taskIcon: taskInfo?.icon || <FileText className="w-4 h-4" />,
+      taskColor: taskInfo?.color || 'from-gray-500 to-gray-600',
       originalPrompt: userPrompt,
       goal: answers.goal,
       audience: answers.audience,
@@ -544,44 +473,32 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
       generatedOutput: generatedOutput,
       createdAt: new Date(),
       rating: undefined,
-      tags: [],
+      tags: [selectedTask, 'custom'],
       isFavorite: false
     };
-
-    setSavedPrompts(prev => [newPrompt, ...prev]);
-    setOnboardingChecklist(prev => ({ ...prev, savePrompt: true }));
-    setShowSaveModal(false);
     
-    // Show success message
-    setTimeout(() => {
-      alert('Prompt saved successfully!');
-    }, 100);
+    setSavedPrompts(prev => [newPrompt, ...prev]);
+    setShowSaveModal(false);
+    setPromptName('');
+    
+    // Update onboarding
+    setOnboardingChecklist(prev => ({ ...prev, savePrompt: true }));
   };
 
   const handleNavigationClick = (itemId: string) => {
-    if (itemId === 'create') {
-      setActiveView('create');
-      resetWizard();
-    } else if (itemId === 'history') {
-      setActiveView('history');
-    } else if (itemId === 'marketplace') {
-      setActiveView('marketplace');
-    } else if (itemId === 'analytics') {
-      setActiveView('analytics');
-    }
+    setActiveSection(itemId);
   };
 
   const handleRunPrompt = (prompt: SavedPrompt) => {
-    // Load the prompt data into the create view
-    setActiveView('create');
-    setSelectedTask(tasks.find(t => t.title === prompt.taskType)?.id || null);
+    // Load the saved prompt back into the create wizard
+    setSelectedTask(prompt.taskType);
     setUserPrompt(prompt.originalPrompt);
     setAnswers({
       goal: prompt.goal,
       audience: prompt.audience,
       tone: prompt.tone
     });
-    setCurrentStep(2);
+    setGeneratedOutput(prompt.generatedOutput);
     
     // Update last used timestamp
     setSavedPrompts(prev => 
@@ -591,183 +508,113 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
           : p
       )
     );
+    
+    // Switch to create section and show final output
+    setActiveSection('create');
+    setCurrentStep(3);
+    setShowQuestions(true);
+    setShowFinalOutput(true);
+    
+    // Add initial AI message to chat
+    setChatHistory([{
+      id: 1,
+      message: "I've loaded your saved prompt! The content has been regenerated. Feel free to ask me to modify anything or make improvements.",
+      sender: 'ai',
+      timestamp: new Date()
+    }]);
   };
 
   const handleToggleFavorite = (promptId: string) => {
-    setSavedPrompts(prev => 
-      prev.map(p => 
-        p.id === promptId 
-          ? { ...p, isFavorite: !p.isFavorite }
-          : p
+    setSavedPrompts(prev =>
+      prev.map(prompt =>
+        prompt.id === promptId
+          ? { ...prompt, isFavorite: !prompt.isFavorite }
+          : prompt
       )
     );
   };
 
   const handleDeletePrompt = (promptId: string) => {
-    if (confirm('Are you sure you want to delete this prompt?')) {
-      setSavedPrompts(prev => prev.filter(p => p.id !== promptId));
+    if (window.confirm('Are you sure you want to delete this prompt?')) {
+      setSavedPrompts(prev => prev.filter(prompt => prompt.id !== promptId));
     }
   };
 
-  const formatTimeAgo = (date: Date) => {
+  const getTimeAgo = (date: Date) => {
     const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
     
-    if (diffInMinutes < 1) return 'Just now';
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays}d ago`;
-    
-    const diffInWeeks = Math.floor(diffInDays / 7);
-    if (diffInWeeks < 4) return `${diffInWeeks}w ago`;
-    
-    const diffInMonths = Math.floor(diffInDays / 30);
-    return `${diffInMonths}mo ago`;
+    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    return `${Math.floor(diffInSeconds / 604800)}w ago`;
   };
 
-  const renderPromptCard = (prompt: SavedPrompt) => {
-    if (viewMode === 'list') {
-      return (
-        <div key={prompt.id} className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4 flex-1 min-w-0">
-              {/* Task Icon */}
-              <div className={`bg-gradient-to-r ${prompt.taskColor} p-2 rounded-lg text-white flex-shrink-0`}>
-                {prompt.taskIcon}
-              </div>
-              
-              {/* Prompt Details */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center space-x-2 mb-1">
-                  <h3 className="font-semibold text-gray-900 truncate">{prompt.name}</h3>
-                  {prompt.isFavorite && (
-                    <Star className="w-4 h-4 text-yellow-500 fill-current flex-shrink-0" />
-                  )}
-                </div>
-                <p className="text-sm text-gray-600 truncate mb-1">{prompt.originalPrompt}</p>
-                <div className="flex items-center space-x-4 text-xs text-gray-500">
-                  <span className="flex items-center">
-                    <Clock className="w-3 h-3 mr-1" />
-                    {formatTimeAgo(prompt.createdAt)}
-                  </span>
-                  {prompt.lastUsed && (
-                    <span>Last used {formatTimeAgo(prompt.lastUsed)}</span>
-                  )}
-                  <span className="bg-gray-100 px-2 py-1 rounded">{prompt.taskType}</span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Actions */}
-            <div className="flex items-center space-x-2 flex-shrink-0">
-              <button
-                onClick={() => handleRunPrompt(prompt)}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center"
-              >
-                <Play className="w-4 h-4 mr-1" />
-                Run
-              </button>
-              <button
-                onClick={() => handleToggleFavorite(prompt.id)}
-                className="p-2 text-gray-400 hover:text-yellow-500 transition-colors"
-              >
-                <Star className={`w-4 h-4 ${prompt.isFavorite ? 'fill-current text-yellow-500' : ''}`} />
-              </button>
-              <button
-                onClick={() => handleDeletePrompt(prompt.id)}
-                className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
+  const filterPrompts = () => {
+    let filtered = [...savedPrompts];
+    
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(prompt =>
+        prompt.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        prompt.originalPrompt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        prompt.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
-
-    // Grid view
-    return (
-      <div key={prompt.id} className="bg-white rounded-xl border border-gray-200 hover:shadow-lg transition-all duration-300 p-6 group">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-4">
-          <div className={`bg-gradient-to-r ${prompt.taskColor} p-3 rounded-lg text-white`}>
-            {prompt.taskIcon}
-          </div>
-          <div className="flex items-center space-x-1">
-            <button
-              onClick={() => handleToggleFavorite(prompt.id)}
-              className="p-1.5 text-gray-400 hover:text-yellow-500 transition-colors opacity-0 group-hover:opacity-100"
-            >
-              <Star className={`w-4 h-4 ${prompt.isFavorite ? 'fill-current text-yellow-500' : ''}`} />
-            </button>
-            <button
-              onClick={() => handleDeletePrompt(prompt.id)}
-              className="p-1.5 text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="mb-4">
-          <div className="flex items-center space-x-2 mb-2">
-            <h3 className="font-semibold text-gray-900 truncate">{prompt.name}</h3>
-            {prompt.isFavorite && (
-              <Star className="w-4 h-4 text-yellow-500 fill-current flex-shrink-0" />
-            )}
-          </div>
-          <p className="text-sm text-gray-600 line-clamp-2 mb-3">{prompt.originalPrompt}</p>
-          
-          {/* Metadata */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span className="flex items-center">
-                <Clock className="w-3 h-3 mr-1" />
-                {formatTimeAgo(prompt.createdAt)}
-              </span>
-              <span className="bg-gray-100 px-2 py-1 rounded">{prompt.taskType}</span>
-            </div>
-            
-            {prompt.goal && (
-              <div className="text-xs">
-                <span className="font-medium text-gray-700">Goal:</span>
-                <span className="text-gray-600 ml-1 line-clamp-1">{prompt.goal}</span>
-              </div>
-            )}
-            
-            {prompt.lastUsed && (
-              <div className="text-xs text-gray-500">
-                Last used {formatTimeAgo(prompt.lastUsed)}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex space-x-2">
-          <button
-            onClick={() => handleRunPrompt(prompt)}
-            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center"
-          >
-            <Play className="w-4 h-4 mr-1" />
-            Run Prompt
-          </button>
-        </div>
-      </div>
-    );
+    
+    // Task type filter
+    if (selectedTaskFilter !== 'all') {
+      filtered = filtered.filter(prompt => prompt.taskType === selectedTaskFilter);
+    }
+    
+    // Time filter
+    if (selectedTimeFilter !== 'all') {
+      const now = new Date();
+      const timeFilters = {
+        '24h': 24 * 60 * 60 * 1000,
+        '7d': 7 * 24 * 60 * 60 * 1000,
+        '30d': 30 * 24 * 60 * 60 * 1000,
+        '90d': 90 * 24 * 60 * 60 * 1000
+      };
+      
+      const timeLimit = timeFilters[selectedTimeFilter as keyof typeof timeFilters];
+      if (timeLimit) {
+        filtered = filtered.filter(prompt => 
+          now.getTime() - prompt.createdAt.getTime() <= timeLimit
+        );
+      }
+    }
+    
+    // Sort
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'newest':
+          return b.createdAt.getTime() - a.createdAt.getTime();
+        case 'oldest':
+          return a.createdAt.getTime() - b.createdAt.getTime();
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'recent':
+          const aLastUsed = a.lastUsed?.getTime() || 0;
+          const bLastUsed = b.lastUsed?.getTime() || 0;
+          return bLastUsed - aLastUsed;
+        default:
+          return 0;
+      }
+    });
+    
+    return filtered;
   };
 
+  const filteredPrompts = filterPrompts();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex">
+    <div className="h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex overflow-hidden">
       {/* Sidebar Navigation */}
-      <div className={`bg-white border-r border-gray-200 transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'} flex flex-col`}>
+      <div className={`bg-white border-r border-gray-200 transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'} flex flex-col flex-shrink-0`}>
         {/* Logo and Collapse Button */}
-        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+        <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
           {!sidebarCollapsed ? (
             <div className="flex items-center space-x-2">
               <img 
@@ -795,7 +642,7 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 p-4">
+        <nav className="flex-1 p-4 overflow-y-auto">
           <ul className="space-y-2">
             {navigationItems.map((item) => (
               <li key={item.id}>
@@ -830,7 +677,7 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
         </nav>
 
         {/* Usage Meter and Profile */}
-        <div className="p-4 border-t border-gray-200 space-y-4">
+        <div className="p-4 border-t border-gray-200 space-y-4 flex-shrink-0">
           {/* Usage Meter */}
           {!sidebarCollapsed && (
             <div className="bg-gray-50 rounded-lg p-3">
@@ -868,27 +715,24 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <header className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                {activeView === 'create' ? 'Prompt Studio' : 
-                 activeView === 'history' ? 'My Prompts' :
-                 activeView === 'marketplace' ? 'Marketplace' :
-                 activeView === 'analytics' ? 'Analytics' : 'Dashboard'}
+                {activeSection === 'create' ? 'Prompt Studio' : 'My Prompts'}
               </h1>
               <p className="text-gray-600">
-                {activeView === 'create' ? 'Create your perfect prompt in three simple steps' :
-                 activeView === 'history' ? 'Manage and reuse your saved prompts' :
-                 activeView === 'marketplace' ? 'Discover and purchase premium prompts' :
-                 activeView === 'analytics' ? 'Track your prompt performance and usage' : 'Welcome to your dashboard'}
+                {activeSection === 'create' 
+                  ? 'Create your perfect prompt in three simple steps'
+                  : 'Manage and reuse your saved prompts'
+                }
               </p>
             </div>
             
             {/* Onboarding Checklist */}
-            {showOnboarding && activeView === 'create' && (
+            {showOnboarding && activeSection === 'create' && (
               <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-4 max-w-sm">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-semibold text-gray-900">Getting Started</h3>
@@ -941,138 +785,10 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
         </header>
 
         {/* Content Area */}
-        <main className="flex-1 overflow-hidden">
-          {activeView === 'history' ? (
-            /* My Prompts View */
-            <div className="h-full flex flex-col">
-              {/* Search and Filters */}
-              <div className="bg-white border-b border-gray-200 p-6">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-                  {/* Search Bar */}
-                  <div className="flex-1 max-w-md">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        type="text"
-                        placeholder="Search prompts..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Filters and View Controls */}
-                  <div className="flex items-center space-x-4">
-                    {/* Filters Button */}
-                    <button
-                      onClick={() => setShowFilters(!showFilters)}
-                      className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <Filter className="w-4 h-4" />
-                      <span>Filters</span>
-                    </button>
-
-                    {/* Sort Dropdown */}
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value as any)}
-                      className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="newest">Newest First</option>
-                      <option value="oldest">Oldest First</option>
-                      <option value="name">Name A-Z</option>
-                      <option value="lastUsed">Recently Used</option>
-                    </select>
-
-                    {/* View Mode Toggle */}
-                    <div className="flex border border-gray-300 rounded-lg overflow-hidden">
-                      <button
-                        onClick={() => setViewMode('grid')}
-                        className={`p-2 ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'} transition-colors`}
-                      >
-                        <Grid className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => setViewMode('list')}
-                        className={`p-2 ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'} transition-colors`}
-                      >
-                        <List className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Filter Panel */}
-                {showFilters && (
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Task Type Filter */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Task Type</label>
-                        <select
-                          value={selectedTaskFilter}
-                          onChange={(e) => setSelectedTaskFilter(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="all">All Tasks</option>
-                          {tasks.map(task => (
-                            <option key={task.id} value={task.title}>{task.title}</option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/* Time Filter */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Time Period</label>
-                        <select
-                          value={selectedTimeFilter}
-                          onChange={(e) => setSelectedTimeFilter(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          {timeFilters.map(filter => (
-                            <option key={filter.id} value={filter.id}>{filter.label}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Prompts Grid/List */}
-              <div className="flex-1 overflow-y-auto p-6">
-                {sortedPrompts.length === 0 ? (
-                  <div className="text-center py-12">
-                    <History className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No prompts found</h3>
-                    <p className="text-gray-600 mb-6">
-                      {searchQuery || selectedTaskFilter !== 'all' || selectedTimeFilter !== 'all'
-                        ? 'Try adjusting your search or filters'
-                        : 'Create your first prompt to get started'}
-                    </p>
-                    <button
-                      onClick={() => handleNavigationClick('create')}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-                    >
-                      Create Your First Prompt
-                    </button>
-                  </div>
-                ) : (
-                  <div className={`${
-                    viewMode === 'grid' 
-                      ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
-                      : 'space-y-4'
-                  }`}>
-                    {sortedPrompts.map(renderPromptCard)}
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : activeView === 'create' ? (
-            /* Create Prompt View */
-            <div className="p-6">
-              <div className="max-w-6xl mx-auto">
+        <main className="flex-1 p-6 overflow-y-auto">
+          <div className="max-w-6xl mx-auto h-full">
+            {activeSection === 'create' ? (
+              <>
                 {/* Step Indicator */}
                 <div className="flex items-center justify-center mb-8">
                   <div className="flex items-center space-x-4">
@@ -1281,19 +997,30 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                   </div>
                 ) : (
                   /* Final Output Split View */
-                  <div className="grid lg:grid-cols-2 gap-6 h-[calc(100vh-200px)]">
+                  <div className="grid lg:grid-cols-2 gap-6 h-full">
                     {/* Left Panel - Task Summary and Chat */}
-                    <div className="bg-white rounded-2xl shadow-lg flex flex-col">
+                    <div className="bg-white rounded-2xl shadow-lg flex flex-col min-h-0">
                       {/* Task Summary Header */}
-                      <div className="p-6 border-b border-gray-200">
-                        <div className="flex items-center mb-4">
-                          <div className={`bg-gradient-to-r ${getSelectedTaskInfo()?.color} p-3 rounded-lg text-white mr-4`}>
-                            {getSelectedTaskInfo()?.icon}
+                      <div className="p-6 border-b border-gray-200 flex-shrink-0">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center">
+                            <div className={`bg-gradient-to-r ${getSelectedTaskInfo()?.color} p-3 rounded-lg text-white mr-4`}>
+                              {getSelectedTaskInfo()?.icon}
+                            </div>
+                            <div>
+                              <h3 className="text-xl font-bold text-gray-900">{getSelectedTaskInfo()?.title}</h3>
+                              <p className="text-gray-600">Your prompt session</p>
+                            </div>
                           </div>
-                          <div>
-                            <h3 className="text-xl font-bold text-gray-900">{getSelectedTaskInfo()?.title}</h3>
-                            <p className="text-gray-600">Your prompt session</p>
-                          </div>
+                          
+                          {/* Save Button */}
+                          <button
+                            onClick={handleSavePrompt}
+                            className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                            title="Save this prompt"
+                          >
+                            <Save className="w-5 h-5" />
+                          </button>
                         </div>
                         
                         {/* Task Details */}
@@ -1327,8 +1054,8 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                       </div>
 
                       {/* Chat Section */}
-                      <div className="flex-1 flex flex-col">
-                        <div className="p-4 border-b border-gray-200">
+                      <div className="flex-1 flex flex-col min-h-0">
+                        <div className="p-4 border-b border-gray-200 flex-shrink-0">
                           <h4 className="font-semibold text-gray-900">Chat with AI</h4>
                           <p className="text-sm text-gray-600">Ask questions or request modifications</p>
                         </div>
@@ -1354,7 +1081,7 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                         </div>
                         
                         {/* Chat Input */}
-                        <div className="p-4 border-t border-gray-200">
+                        <div className="p-4 border-t border-gray-200 flex-shrink-0">
                           <div className="flex space-x-2">
                             <input
                               type="text"
@@ -1377,22 +1104,15 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                     </div>
 
                     {/* Right Panel - Generated Output */}
-                    <div className="bg-white rounded-2xl shadow-lg flex flex-col">
+                    <div className="bg-white rounded-2xl shadow-lg flex flex-col min-h-0">
                       {/* Output Header */}
-                      <div className="p-6 border-b border-gray-200">
+                      <div className="p-6 border-b border-gray-200 flex-shrink-0">
                         <div className="flex items-center justify-between mb-4">
                           <div>
                             <h3 className="text-xl font-bold text-gray-900">Generated Output</h3>
                             <p className="text-gray-600">Your polished content is ready</p>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <button
-                              onClick={handleSavePrompt}
-                              className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                              title="Save Prompt"
-                            >
-                              <Save className="w-5 h-5" />
-                            </button>
                             <button
                               onClick={() => {/* Regenerate logic */}}
                               className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
@@ -1414,9 +1134,13 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                         <div className="flex space-x-2">
                           <button
                             onClick={handleCopyOutput}
-                            className="flex-1 bg-blue-100 text-blue-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors flex items-center justify-center relative"
+                            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-center ${
+                              copySuccess 
+                                ? 'bg-green-100 text-green-700 border border-green-200' 
+                                : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                            }`}
                           >
-                            {showCopySuccess ? (
+                            {copySuccess ? (
                               <>
                                 <Check className="w-4 h-4 mr-1" />
                                 Copied!
@@ -1455,7 +1179,7 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                       </div>
 
                       {/* Rating Section */}
-                      <div className="p-6 border-t border-gray-200">
+                      <div className="p-6 border-t border-gray-200 flex-shrink-0">
                         <div className="flex items-center justify-between">
                           <div>
                             <h4 className="font-semibold text-gray-900">Rate this output</h4>
@@ -1492,32 +1216,314 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                   <div className="mt-6 text-center">
                     <button
                       onClick={resetWizard}
-                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-8 rounded-lg font-medium transition-colors"
+                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-medium transition-colors"
                     >
                       Create Another Prompt
                     </button>
                   </div>
                 )}
+              </>
+            ) : (
+              /* My Prompts Section */
+              <div className="space-y-6">
+                {/* Search and Filter Bar */}
+                <div className="bg-white rounded-2xl shadow-lg p-6">
+                  <div className="flex flex-col lg:flex-row gap-4">
+                    {/* Search Bar */}
+                    <div className="flex-1 relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="Search prompts by name, content, or tags..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                    
+                    {/* Filter Toggle */}
+                    <button
+                      onClick={() => setShowFilters(!showFilters)}
+                      className={`flex items-center px-4 py-3 rounded-lg border transition-colors ${
+                        showFilters 
+                          ? 'bg-blue-50 border-blue-200 text-blue-700' 
+                          : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <Filter className="w-5 h-5 mr-2" />
+                      Filters
+                    </button>
+                    
+                    {/* View Mode Toggle */}
+                    <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+                      <button
+                        onClick={() => setViewMode('grid')}
+                        className={`p-3 transition-colors ${
+                          viewMode === 'grid' 
+                            ? 'bg-blue-500 text-white' 
+                            : 'bg-white text-gray-600 hover:bg-gray-50'
+                        }`}
+                      >
+                        <Grid className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => setViewMode('list')}
+                        className={`p-3 transition-colors ${
+                          viewMode === 'list' 
+                            ? 'bg-blue-500 text-white' 
+                            : 'bg-white text-gray-600 hover:bg-gray-50'
+                        }`}
+                      >
+                        <List className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Advanced Filters */}
+                  {showFilters && (
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Task Type Filter */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Task Type</label>
+                          <select
+                            value={selectedTaskFilter}
+                            onChange={(e) => setSelectedTaskFilter(e.target.value)}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          >
+                            <option value="all">All Tasks</option>
+                            {tasks.map(task => (
+                              <option key={task.id} value={task.id}>{task.title}</option>
+                            ))}
+                          </select>
+                        </div>
+                        
+                        {/* Time Filter */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Time Period</label>
+                          <select
+                            value={selectedTimeFilter}
+                            onChange={(e) => setSelectedTimeFilter(e.target.value)}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          >
+                            <option value="all">All Time</option>
+                            <option value="24h">Last 24 Hours</option>
+                            <option value="7d">Last 7 Days</option>
+                            <option value="30d">Last 30 Days</option>
+                            <option value="90d">Last 90 Days</option>
+                          </select>
+                        </div>
+                        
+                        {/* Sort By */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                          <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          >
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="name">Name A-Z</option>
+                            <option value="recent">Recently Used</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Prompts Grid/List */}
+                {filteredPrompts.length > 0 ? (
+                  <div className={viewMode === 'grid' 
+                    ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
+                    : 'space-y-4'
+                  }>
+                    {filteredPrompts.map((prompt) => (
+                      <div
+                        key={prompt.id}
+                        className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group ${
+                          viewMode === 'grid' ? 'p-6' : 'p-4 flex items-center space-x-4'
+                        }`}
+                      >
+                        {viewMode === 'grid' ? (
+                          <>
+                            {/* Grid View */}
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center space-x-3">
+                                <div className={`bg-gradient-to-r ${prompt.taskColor} p-2 rounded-lg text-white`}>
+                                  {prompt.taskIcon}
+                                </div>
+                                <div>
+                                  <h3 className="font-semibold text-gray-900 truncate">{prompt.name}</h3>
+                                  <p className="text-sm text-gray-500">{getTimeAgo(prompt.createdAt)}</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                  onClick={() => handleToggleFavorite(prompt.id)}
+                                  className={`p-1 rounded transition-colors ${
+                                    prompt.isFavorite 
+                                      ? 'text-yellow-500 hover:text-yellow-600' 
+                                      : 'text-gray-400 hover:text-yellow-500'
+                                  }`}
+                                >
+                                  <Star className={`w-4 h-4 ${prompt.isFavorite ? 'fill-current' : ''}`} />
+                                </button>
+                                <button
+                                  onClick={() => handleDeletePrompt(prompt.id)}
+                                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                            
+                            <div className="mb-4">
+                              <p className="text-sm text-gray-700 line-clamp-3">{prompt.originalPrompt}</p>
+                            </div>
+                            
+                            <div className="flex flex-wrap gap-1 mb-4">
+                              {prompt.tags.slice(0, 3).map((tag, index) => (
+                                <span
+                                  key={index}
+                                  className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                              {prompt.tags.length > 3 && (
+                                <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                                  +{prompt.tags.length - 3}
+                                </span>
+                              )}
+                            </div>
+                            
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                {prompt.rating && (
+                                  <div className="flex items-center">
+                                    {[...Array(5)].map((_, i) => (
+                                      <Star
+                                        key={i}
+                                        className={`w-3 h-3 ${
+                                          i < prompt.rating! 
+                                            ? 'text-yellow-400 fill-current' 
+                                            : 'text-gray-300'
+                                        }`}
+                                      />
+                                    ))}
+                                  </div>
+                                )}
+                                {prompt.lastUsed && (
+                                  <span className="text-xs text-gray-500">
+                                    Used {getTimeAgo(prompt.lastUsed)}
+                                  </span>
+                                )}
+                              </div>
+                              <button
+                                onClick={() => handleRunPrompt(prompt)}
+                                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center"
+                              >
+                                <Play className="w-4 h-4 mr-1" />
+                                Run
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            {/* List View */}
+                            <div className={`bg-gradient-to-r ${prompt.taskColor} p-3 rounded-lg text-white flex-shrink-0`}>
+                              {prompt.taskIcon}
+                            </div>
+                            
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center space-x-2 mb-1">
+                                <h3 className="font-semibold text-gray-900 truncate">{prompt.name}</h3>
+                                {prompt.isFavorite && (
+                                  <Star className="w-4 h-4 text-yellow-500 fill-current flex-shrink-0" />
+                                )}
+                              </div>
+                              <p className="text-sm text-gray-600 truncate">{prompt.originalPrompt}</p>
+                              <div className="flex items-center space-x-4 mt-1">
+                                <span className="text-xs text-gray-500">{getTimeAgo(prompt.createdAt)}</span>
+                                {prompt.lastUsed && (
+                                  <span className="text-xs text-gray-500">
+                                    Used {getTimeAgo(prompt.lastUsed)}
+                                  </span>
+                                )}
+                                {prompt.rating && (
+                                  <div className="flex items-center">
+                                    <Star className="w-3 h-3 text-yellow-400 fill-current mr-1" />
+                                    <span className="text-xs text-gray-500">{prompt.rating}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center space-x-2 flex-shrink-0">
+                              <button
+                                onClick={() => handleToggleFavorite(prompt.id)}
+                                className={`p-2 rounded transition-colors ${
+                                  prompt.isFavorite 
+                                    ? 'text-yellow-500 hover:text-yellow-600' 
+                                    : 'text-gray-400 hover:text-yellow-500'
+                                }`}
+                              >
+                                <Star className={`w-4 h-4 ${prompt.isFavorite ? 'fill-current' : ''}`} />
+                              </button>
+                              <button
+                                onClick={() => handleRunPrompt(prompt)}
+                                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center"
+                              >
+                                <Play className="w-4 h-4 mr-1" />
+                                Run
+                              </button>
+                              <button
+                                onClick={() => handleDeletePrompt(prompt.id)}
+                                className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  /* Empty State */
+                  <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <History className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      {searchTerm || selectedTaskFilter !== 'all' || selectedTimeFilter !== 'all' 
+                        ? 'No prompts found' 
+                        : 'No saved prompts yet'
+                      }
+                    </h3>
+                    <p className="text-gray-600 mb-6">
+                      {searchTerm || selectedTaskFilter !== 'all' || selectedTimeFilter !== 'all'
+                        ? 'Try adjusting your search or filters to find what you\'re looking for.'
+                        : 'Create your first prompt to get started with your personal prompt library.'
+                      }
+                    </p>
+                    <button
+                      onClick={() => setActiveSection('create')}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105"
+                    >
+                      Create Your First Prompt
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
-          ) : (
-            /* Other Views (Marketplace, Analytics) */
-            <div className="p-6">
-              <div className="max-w-4xl mx-auto text-center py-12">
-                <div className="text-6xl mb-4">🚧</div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Coming Soon</h2>
-                <p className="text-gray-600">
-                  {activeView === 'marketplace' 
-                    ? 'The Marketplace will allow you to discover and purchase premium prompts from the community.'
-                    : 'Analytics will help you track your prompt performance and usage patterns.'}
-                </p>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </main>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-gray-200 px-6 py-4">
+        <footer className="bg-white border-t border-gray-200 px-6 py-4 flex-shrink-0">
           <div className="flex items-center justify-between text-sm text-gray-500">
             <div className="flex items-center space-x-4">
               <span>&copy; 2025 Dorp AI. All rights reserved.</span>
@@ -1535,38 +1541,19 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
       {/* Save Prompt Modal */}
       {showSaveModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Save Prompt</h2>
-                <p className="text-gray-600 mt-1">Save this prompt for future use</p>
-              </div>
-              <button
-                onClick={() => setShowSaveModal(false)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-
-            {/* Content */}
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
             <div className="p-6">
-              {/* Info Box */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <div className="flex items-start space-x-3">
-                  <Check className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-sm text-blue-800 font-medium mb-1">Reuse Your Prompts</p>
-                    <p className="text-sm text-blue-700">
-                      Saved prompts can be reused in the future and are available in the My Prompts section.
-                    </p>
-                  </div>
-                </div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-gray-900">Save Prompt</h3>
+                <button
+                  onClick={() => setShowSaveModal(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
               </div>
-
-              {/* Prompt Name */}
-              <div className="mb-6">
+              
+              <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Prompt Name (Optional)
                 </label>
@@ -1574,46 +1561,35 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                   type="text"
                   value={promptName}
                   onChange={(e) => setPromptName(e.target.value)}
-                  placeholder="Enter a custom name for your prompt"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter a custom name or leave blank for auto-generated name"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  Default: {generateDefaultPromptName()}
-                </p>
               </div>
-
-              {/* Prompt Preview */}
-              <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Prompt Preview</h3>
-                <div className="bg-gray-50 rounded-lg p-4 space-y-3 max-h-40 overflow-y-auto">
-                  <div>
-                    <span className="text-xs font-semibold text-gray-600">Task:</span>
-                    <p className="text-sm text-gray-800">{getSelectedTaskInfo()?.title}</p>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div className="flex items-start space-x-3">
+                  <div className="bg-blue-500 rounded-full p-1 flex-shrink-0 mt-0.5">
+                    <Check className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <span className="text-xs font-semibold text-gray-600">Request:</span>
-                    <p className="text-sm text-gray-800">{userPrompt.slice(0, 100)}{userPrompt.length > 100 ? '...' : ''}</p>
+                    <h4 className="font-semibold text-blue-900 mb-1">Saved prompts can be reused!</h4>
+                    <p className="text-sm text-blue-700">
+                      Your saved prompts will be available in the "My Prompts" section where you can easily run them again or use them as templates for new content.
+                    </p>
                   </div>
-                  {answers.goal && (
-                    <div>
-                      <span className="text-xs font-semibold text-gray-600">Goal:</span>
-                      <p className="text-sm text-gray-800">{answers.goal.slice(0, 50)}{answers.goal.length > 50 ? '...' : ''}</p>
-                    </div>
-                  )}
                 </div>
               </div>
-
-              {/* Action Buttons */}
+              
               <div className="flex space-x-3">
                 <button
                   onClick={() => setShowSaveModal(false)}
-                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium transition-colors"
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-lg font-medium transition-colors"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={handleSaveConfirm}
-                  className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-medium transition-colors"
+                  onClick={confirmSavePrompt}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300"
                 >
                   Save Prompt
                 </button>
