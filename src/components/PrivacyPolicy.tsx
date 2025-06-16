@@ -271,6 +271,7 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ onBack }) => {
             <div className="flex space-x-6">
               <span className="text-gray-300">Privacy</span>
               <button onClick={onBack} className="text-gray-300 hover:text-white transition-colors">Terms</button>
+              <button onClick={onBack} className="text-gray-300 hover:text-white transition-colors">Blog</button>
               <a href="#" className="text-gray-300 hover:text-white transition-colors">Support</a>
             </div>
           </div>

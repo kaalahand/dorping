@@ -17,6 +17,7 @@ import SignupModal from './components/SignupModal';
 import AboutUs from './components/AboutUs';
 import TermsAndConditions from './components/TermsAndConditions';
 import PrivacyPolicy from './components/PrivacyPolicy';
+import Blog from './components/Blog';
 
 function App() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -25,6 +26,7 @@ function App() {
   const [showAboutUs, setShowAboutUs] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showBlog, setShowBlog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<{
     name: string;
     price: string;
@@ -168,6 +170,10 @@ function App() {
     return <PrivacyPolicy onBack={() => setShowPrivacy(false)} />;
   }
 
+  if (showBlog) {
+    return <Blog onBack={() => setShowBlog(false)} />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Navigation */}
@@ -188,6 +194,12 @@ function App() {
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 About Us
+              </button>
+              <button 
+                onClick={() => setShowBlog(true)}
+                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Blog
               </button>
               <button 
                 onClick={scrollToPricing}
@@ -514,6 +526,12 @@ function App() {
                 className="text-gray-300 hover:text-white transition-colors"
               >
                 Terms
+              </button>
+              <button 
+                onClick={() => setShowBlog(true)}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Blog
               </button>
               <a href="#" className="text-gray-300 hover:text-white transition-colors">Support</a>
             </div>

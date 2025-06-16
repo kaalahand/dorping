@@ -291,8 +291,9 @@ const AboutUs: React.FC<AboutUsProps> = ({ onBack }) => {
               <span className="text-xl font-bold">Dorp AI</span>
             </div>
             <div className="flex space-x-6">
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">Privacy</a>
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">Terms</a>
+              <button onClick={onBack} className="text-gray-300 hover:text-white transition-colors">Privacy</button>
+              <button onClick={onBack} className="text-gray-300 hover:text-white transition-colors">Terms</button>
+              <button onClick={onBack} className="text-gray-300 hover:text-white transition-colors">Blog</button>
               <a href="#" className="text-gray-300 hover:text-white transition-colors">Support</a>
             </div>
           </div>
