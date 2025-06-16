@@ -11,8 +11,7 @@ import {
   Check,
   Star,
   Users,
-  Clock,
-  Zap
+  Clock
 } from 'lucide-react';
 import SignupModal from './components/SignupModal';
 
@@ -154,8 +153,12 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <Zap className="w-8 h-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">AI Craft</span>
+              <img 
+                src="/Dorp_logo_v1 (1)-Photoroom.png" 
+                alt="Dorp AI Logo" 
+                className="w-8 h-8"
+              />
+              <span className="text-xl font-bold text-gray-900">Dorp AI</span>
             </div>
             <div className="flex items-center space-x-4">
               <button 
@@ -464,8 +467,12 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Zap className="w-8 h-8 text-blue-400" />
-              <span className="text-xl font-bold">AI Craft</span>
+              <img 
+                src="/Dorp_logo_v1 (1)-Photoroom.png" 
+                alt="Dorp AI Logo" 
+                className="w-8 h-8"
+              />
+              <span className="text-xl font-bold">Dorp AI</span>
             </div>
             <div className="flex space-x-6">
               <a href="#" className="text-gray-300 hover:text-white transition-colors">Privacy</a>
@@ -474,7 +481,7 @@ function App() {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400">
-            <p>&copy; 2025 AI Craft. All rights reserved.</p>
+            <p>&copy; 2025 Dorp AI. All rights reserved.</p>
           </div>
         </div>
       </footer>
