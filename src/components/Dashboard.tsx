@@ -361,11 +361,11 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex">
+    <div className="h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex overflow-hidden">
       {/* Sidebar Navigation */}
-      <div className={`bg-white border-r border-gray-200 transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'} flex flex-col`}>
+      <div className={`bg-white border-r border-gray-200 transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'} flex flex-col flex-shrink-0`}>
         {/* Logo and Collapse Button */}
-        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+        <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
           {!sidebarCollapsed ? (
             <div className="flex items-center space-x-2">
               <img 
@@ -393,7 +393,7 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 p-4">
+        <nav className="flex-1 p-4 overflow-y-auto">
           <ul className="space-y-2">
             {navigationItems.map((item) => (
               <li key={item.id}>
@@ -427,7 +427,7 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
         </nav>
 
         {/* Usage Meter and Profile */}
-        <div className="p-4 border-t border-gray-200 space-y-4">
+        <div className="p-4 border-t border-gray-200 space-y-4 flex-shrink-0">
           {/* Usage Meter */}
           {!sidebarCollapsed && (
             <div className="bg-gray-50 rounded-lg p-3">
@@ -465,9 +465,9 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <header className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Prompt Studio</h1>
@@ -516,8 +516,8 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
         </header>
 
         {/* Prompt Studio Content */}
-        <main className="flex-1 p-6">
-          <div className="max-w-6xl mx-auto">
+        <main className="flex-1 p-6 overflow-y-auto">
+          <div className="max-w-6xl mx-auto h-full">
             {/* Step Indicator */}
             <div className="flex items-center justify-center mb-8">
               <div className="flex items-center space-x-4">
@@ -726,11 +726,11 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
               </div>
             ) : (
               /* Final Output Split View */
-              <div className="grid lg:grid-cols-2 gap-6 h-[calc(100vh-200px)]">
+              <div className="grid lg:grid-cols-2 gap-6 h-full">
                 {/* Left Panel - Task Summary and Chat */}
-                <div className="bg-white rounded-2xl shadow-lg flex flex-col">
+                <div className="bg-white rounded-2xl shadow-lg flex flex-col min-h-0">
                   {/* Task Summary Header */}
-                  <div className="p-6 border-b border-gray-200">
+                  <div className="p-6 border-b border-gray-200 flex-shrink-0">
                     <div className="flex items-center mb-4">
                       <div className={`bg-gradient-to-r ${getSelectedTaskInfo()?.color} p-3 rounded-lg text-white mr-4`}>
                         {getSelectedTaskInfo()?.icon}
@@ -772,8 +772,8 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                   </div>
 
                   {/* Chat Section */}
-                  <div className="flex-1 flex flex-col">
-                    <div className="p-4 border-b border-gray-200">
+                  <div className="flex-1 flex flex-col min-h-0">
+                    <div className="p-4 border-b border-gray-200 flex-shrink-0">
                       <h4 className="font-semibold text-gray-900">Chat with AI</h4>
                       <p className="text-sm text-gray-600">Ask questions or request modifications</p>
                     </div>
@@ -799,7 +799,7 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                     </div>
                     
                     {/* Chat Input */}
-                    <div className="p-4 border-t border-gray-200">
+                    <div className="p-4 border-t border-gray-200 flex-shrink-0">
                       <div className="flex space-x-2">
                         <input
                           type="text"
@@ -822,9 +822,9 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                 </div>
 
                 {/* Right Panel - Generated Output */}
-                <div className="bg-white rounded-2xl shadow-lg flex flex-col">
+                <div className="bg-white rounded-2xl shadow-lg flex flex-col min-h-0">
                   {/* Output Header */}
-                  <div className="p-6 border-b border-gray-200">
+                  <div className="p-6 border-b border-gray-200 flex-shrink-0">
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <h3 className="text-xl font-bold text-gray-900">Generated Output</h3>
@@ -884,7 +884,7 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                   </div>
 
                   {/* Rating Section */}
-                  <div className="p-6 border-t border-gray-200">
+                  <div className="p-6 border-t border-gray-200 flex-shrink-0">
                     <div className="flex items-center justify-between">
                       <div>
                         <h4 className="font-semibold text-gray-900">Rate this output</h4>
@@ -931,7 +931,7 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
         </main>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-gray-200 px-6 py-4">
+        <footer className="bg-white border-t border-gray-200 px-6 py-4 flex-shrink-0">
           <div className="flex items-center justify-between text-sm text-gray-500">
             <div className="flex items-center space-x-4">
               <span>&copy; 2025 Dorp AI. All rights reserved.</span>
