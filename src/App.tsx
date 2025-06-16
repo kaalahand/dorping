@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import SignupModal from './components/SignupModal';
 import SignInModal from './components/SignInModal';
+import Dashboard from './components/Dashboard';
 import AboutUs from './components/AboutUs';
 import TermsAndConditions from './components/TermsAndConditions';
 import PrivacyPolicy from './components/PrivacyPolicy';
@@ -33,6 +34,7 @@ function App() {
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showBlog, setShowBlog] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<{
     name: string;
@@ -98,6 +100,16 @@ function App() {
   const handleSwitchToSignIn = () => {
     setIsSignupModalOpen(false);
     setIsSignInModalOpen(true);
+  };
+
+  const handleSuccessfulAuth = () => {
+    setIsSignupModalOpen(false);
+    setIsSignInModalOpen(false);
+    setShowDashboard(true);
+  };
+
+  const handleLogout = () => {
+    setShowDashboard(false);
   };
 
   // Function to handle blog navigation and scroll to top
@@ -268,6 +280,15 @@ function App() {
         canonicalUrl: "https://dorp.ai/terms-and-conditions"
       };
     }
+
+    if (showDashboard) {
+      return {
+        title: "Dashboard - Dorp AI | Create Perfect Prompts Instantly",
+        description: "Access your Dorp AI dashboard to create, manage, and optimize your AI prompts. Transform your thoughts into polished content with our intelligent prompt engineering studio.",
+        keywords: "dorp ai dashboard, prompt studio, ai content creation, prompt engineering tool, ai writing dashboard",
+        canonicalUrl: "https://dorp.ai/dashboard"
+      };
+    }
     
     // Default homepage SEO
     return {
@@ -277,6 +298,16 @@ function App() {
       canonicalUrl: "https://dorp.ai/"
     };
   };
+
+  // Show dashboard if user is authenticated
+  if (showDashboard) {
+    return (
+      <>
+        <SEOHead {...getSEOData()} />
+        <Dashboard onLogout={handleLogout} />
+      </>
+    );
+  }
 
   // Show different pages based on state
   if (showAboutUs) {
@@ -745,6 +776,7 @@ function App() {
           isOpen={isSignupModalOpen}
           onClose={() => setIsSignupModalOpen(false)}
           onSwitchToSignIn={handleSwitchToSignIn}
+          onSuccess={handleSuccessfulAuth}
           selectedPlan={selectedPlan}
         />
         
@@ -752,6 +784,7 @@ function App() {
           isOpen={isSignInModalOpen}
           onClose={() => setIsSignInModalOpen(false)}
           onSwitchToSignup={handleSwitchToSignup}
+          onSuccess={handleSuccessfulAuth}
         />
       </div>
     </>

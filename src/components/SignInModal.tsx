@@ -5,9 +5,10 @@ interface SignInModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSwitchToSignup: () => void;
+  onSuccess: () => void;
 }
 
-const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSwitchToSignup }) => {
+const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSwitchToSignup, onSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -27,13 +28,15 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSwitchToSi
     console.log('Sign in attempt:', { email, password, rememberMe });
     
     setIsLoading(false);
-    // For demo purposes, we'll just close the modal
-    onClose();
+    // Redirect to dashboard on successful sign in
+    onSuccess();
   };
 
   const handleGoogleSignIn = () => {
     // Here you would integrate with Google OAuth
     console.log('Google sign in');
+    // For demo purposes, redirect to dashboard
+    onSuccess();
   };
 
   const handleForgotPassword = () => {

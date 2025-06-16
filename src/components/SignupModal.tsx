@@ -5,6 +5,7 @@ interface SignupModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSwitchToSignIn: () => void;
+  onSuccess: () => void;
   selectedPlan: {
     name: string;
     price: string;
@@ -13,7 +14,7 @@ interface SignupModalProps {
   } | null;
 }
 
-const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToSignIn, selectedPlan }) => {
+const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToSignIn, onSuccess, selectedPlan }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -71,13 +72,15 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToSi
     console.log('Signup attempt:', { email, password, plan: currentPlan });
     
     setIsLoading(false);
-    // For demo purposes, we'll just close the modal
-    onClose();
+    // Redirect to dashboard on successful signup
+    onSuccess();
   };
 
   const handleGoogleSignup = () => {
     // Here you would integrate with Google OAuth
     console.log('Google signup for plan:', currentPlan);
+    // For demo purposes, redirect to dashboard
+    onSuccess();
   };
 
   const handlePlanSelect = (plan: typeof plans[0]) => {
