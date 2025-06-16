@@ -50,6 +50,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [chatHistory, setChatHistory] = useState<Array<{id: number, message: string, sender: 'user' | 'ai', timestamp: Date}>>([]);
   const [generatedOutput, setGeneratedOutput] = useState('');
   const [isGeneratingFinal, setIsGeneratingFinal] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const [answers, setAnswers] = useState({
     goal: '',
     audience: '',
@@ -340,9 +342,24 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
     setGeneratedOutput('');
   };
 
-  const handleCopyOutput = () => {
-    navigator.clipboard.writeText(generatedOutput);
-    // You could add a toast notification here
+  const handleCopyOutput = async () => {
+    try {
+      await navigator.clipboard.writeText(generatedOutput);
+      setCopySuccess(true);
+      setShowToast(true);
+      
+      // Reset the copy success state after 2 seconds
+      setTimeout(() => {
+        setCopySuccess(false);
+      }, 2000);
+      
+      // Hide toast after 3 seconds
+      setTimeout(() => {
+        setShowToast(false);
+      }, 3000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
   };
 
   const handleDownloadOutput = () => {
@@ -362,6 +379,16 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
 
   return (
     <div className="h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex overflow-hidden">
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed top-4 right-4 z-50 animate-fade-in">
+          <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2">
+            <Check className="w-5 h-5" />
+            <span className="font-medium">Content copied to clipboard!</span>
+          </div>
+        </div>
+      )}
+
       {/* Sidebar Navigation */}
       <div className={`bg-white border-r border-gray-200 transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'} flex flex-col flex-shrink-0`}>
         {/* Logo and Collapse Button */}
@@ -852,10 +879,23 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                     <div className="flex space-x-2">
                       <button
                         onClick={handleCopyOutput}
-                        className="flex-1 bg-blue-100 text-blue-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors flex items-center justify-center"
+                        className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-center ${
+                          copySuccess 
+                            ? 'bg-green-100 text-green-700 border border-green-200' 
+                            : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                        }`}
                       >
-                        <Copy className="w-4 h-4 mr-1" />
-                        Copy
+                        {copySuccess ? (
+                          <>
+                            <Check className="w-4 h-4 mr-1" />
+                            Copied!
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-4 h-4 mr-1" />
+                            Copy
+                          </>
+                        )}
                       </button>
                       <button
                         onClick={handleDownloadOutput}
