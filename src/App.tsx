@@ -199,7 +199,7 @@ function App() {
                 onClick={() => setShowBlog(true)}
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
-                Blog
+                Blogs
               </button>
               <button 
                 onClick={scrollToPricing}
@@ -531,7 +531,7 @@ function App() {
                 onClick={() => setShowBlog(true)}
                 className="text-gray-300 hover:text-white transition-colors"
               >
-                Blog
+                Blogs
               </button>
               <a href="#" className="text-gray-300 hover:text-white transition-colors">Support</a>
             </div>
