@@ -161,28 +161,27 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       <div className={`bg-white border-r border-gray-200 transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'} flex flex-col`}>
         {/* Logo and Collapse Button */}
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-          {!sidebarCollapsed && (
+          {!sidebarCollapsed ? (
             <div className="flex items-center space-x-2">
               <img 
                 src="/Dorp_logo_v1 (1)-Photoroom.png" 
                 alt="Dorp AI Logo" 
-                className="w-8 h-8"
+                className="w-8 h-8 flex-shrink-0"
               />
               <span className="text-xl font-bold text-gray-900">Dorp AI</span>
             </div>
-          )}
-          {sidebarCollapsed && (
+          ) : (
             <div className="flex items-center justify-center w-full">
               <img 
                 src="/Dorp_logo_v1 (1)-Photoroom.png" 
                 alt="Dorp AI Logo" 
-                className="w-8 h-8"
+                className="w-10 h-10"
               />
             </div>
           )}
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className={`p-2 hover:bg-gray-100 rounded-lg transition-colors ${sidebarCollapsed ? 'absolute right-2' : ''}`}
           >
             {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
@@ -239,19 +238,19 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           )}
 
           {/* User Profile */}
-          <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-3'}`}>
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-              <User className="w-4 h-4 text-white" />
+          <div className={`flex items-center ${sidebarCollapsed ? 'flex-col space-y-2' : 'space-x-3'}`}>
+            <div className={`${sidebarCollapsed ? 'w-10 h-10' : 'w-8 h-8'} bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0`}>
+              <User className={`${sidebarCollapsed ? 'w-5 h-5' : 'w-4 h-4'} text-white`} />
             </div>
             {!sidebarCollapsed && (
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">John Doe</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">John Doe</p>
                 <p className="text-xs text-gray-500">Free Plan</p>
               </div>
             )}
             <button
               onClick={onLogout}
-              className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+              className={`p-2 text-gray-400 hover:text-gray-600 transition-colors ${sidebarCollapsed ? 'w-full flex justify-center' : ''}`}
               title="Logout"
             >
               <LogOut className="w-4 h-4" />
