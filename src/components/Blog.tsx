@@ -319,7 +319,7 @@ const SEOBlogArticle: React.FC<{ onBack: () => void; onHome: () => void }> = ({ 
               <li><strong>Enter your topic or niche</strong><br />
                 Example: "AI for content marketing"</li>
               <li><strong>Get keyword suggestions</strong><br />
-                Dorp.ai will recommend primary and secondary keywords, such as "AI blog writing," "SEO content generator," and "AI-powered blog posts."</li>
+                Dorp.ai will recommend primary and secondary keywords, such as "AI blog writing," "SEO content generator,\" and "AI-powered blog posts."</li>
               <li><strong>Analyze search intent</strong><br />
                 Select keywords that match your goals—informational, commercial, or navigational.</li>
             </ol>
