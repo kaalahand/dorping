@@ -30,7 +30,9 @@ import {
   RefreshCw,
   ThumbsUp,
   ThumbsDown,
-  Edit3
+  Edit3,
+  Save,
+  BookmarkPlus
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -52,6 +54,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [isGeneratingFinal, setIsGeneratingFinal] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [promptName, setPromptName] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [answers, setAnswers] = useState({
     goal: '',
     audience: '',
@@ -377,6 +382,58 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
     console.log('Export to external service');
   };
 
+  const generateDefaultPromptName = () => {
+    const taskInfo = getSelectedTaskInfo();
+    const taskType = taskInfo?.title || 'Prompt';
+    const summary = userPrompt.slice(0, 30).replace(/\s+/g, '-').toLowerCase();
+    const date = new Date().toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric' 
+    }).replace(/\s/g, '-');
+    
+    return `${taskType}-${summary}-${date}`;
+  };
+
+  const handleSavePrompt = () => {
+    setPromptName(generateDefaultPromptName());
+    setShowSaveModal(true);
+  };
+
+  const handleConfirmSave = async () => {
+    // Simulate saving to backend
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Here you would save the prompt data:
+    const promptData = {
+      name: promptName,
+      task: selectedTask,
+      userPrompt,
+      answers,
+      generatedOutput,
+      createdAt: new Date()
+    };
+    
+    console.log('Saving prompt:', promptData);
+    
+    setSaveSuccess(true);
+    setShowSaveModal(false);
+    
+    // Update onboarding
+    setOnboardingChecklist(prev => ({ ...prev, savePrompt: true }));
+    
+    // Show success toast
+    setTimeout(() => {
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }, 500);
+    
+    // Reset save success after showing
+    setTimeout(() => {
+      setSaveSuccess(false);
+    }, 3000);
+  };
+
   return (
     <div className="h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex overflow-hidden">
       {/* Toast Notification */}
@@ -384,7 +441,105 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
         <div className="fixed top-4 right-4 z-50 animate-fade-in">
           <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2">
             <Check className="w-5 h-5" />
-            <span className="font-medium">Content copied to clipboard!</span>
+            <span className="font-medium">
+              {saveSuccess ? 'Prompt saved successfully!' : 'Content copied to clipboard!'}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Save Prompt Modal */}
+      {showSaveModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center space-x-3">
+                <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-2 rounded-lg text-white">
+                  <BookmarkPlus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">Save Prompt</h3>
+                  <p className="text-sm text-gray-600">Save for future reuse</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowSaveModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6">
+              {/* Info Box */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div className="flex items-start space-x-3">
+                  <div className="bg-blue-500 rounded-full p-1 mt-0.5">
+                    <Check className="w-3 h-3 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-blue-900 mb-1">Save for Later</h4>
+                    <p className="text-sm text-blue-700">
+                      Saved prompts can be reused in the future and are available in the 
+                      <span className="font-semibold"> My Prompts</span> section.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Prompt Name Input */}
+              <div className="mb-6">
+                <label htmlFor="prompt-name" className="block text-sm font-medium text-gray-700 mb-2">
+                  Prompt Name (Optional)
+                </label>
+                <input
+                  type="text"
+                  id="prompt-name"
+                  value={promptName}
+                  onChange={(e) => setPromptName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter a custom name or use default"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Default: {generateDefaultPromptName()}
+                </p>
+              </div>
+
+              {/* Prompt Preview */}
+              <div className="mb-6">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Prompt Preview:</h4>
+                <div className="bg-gray-50 rounded-lg p-3 max-h-32 overflow-y-auto">
+                  <div className="text-xs text-gray-600 mb-1">
+                    <span className="font-semibold">Task:</span> {getSelectedTaskInfo()?.title}
+                  </div>
+                  <div className="text-xs text-gray-600 mb-1">
+                    <span className="font-semibold">Request:</span> {userPrompt.slice(0, 100)}...
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    <span className="font-semibold">Goal:</span> {answers.goal || 'Not specified'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setShowSaveModal(false)}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmSave}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-2 px-4 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Prompt
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -529,12 +684,24 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                     </span>
                   </li>
                   <li className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-gray-300 rounded"></div>
-                    <span className="text-sm text-gray-600">Save a Prompt</span>
+                    {onboardingChecklist.savePrompt ? (
+                      <Check className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <div className="w-4 h-4 border-2 border-gray-300 rounded"></div>
+                    )}
+                    <span className={`text-sm ${onboardingChecklist.savePrompt ? 'text-gray-600 line-through' : 'text-gray-900 font-medium'}`}>
+                      Save a Prompt
+                    </span>
                   </li>
                   <li className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-gray-300 rounded"></div>
-                    <span className="text-sm text-gray-600">Rate a Prompt's Quality</span>
+                    {onboardingChecklist.ratePrompt ? (
+                      <Check className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <div className="w-4 h-4 border-2 border-gray-300 rounded"></div>
+                    )}
+                    <span className={`text-sm ${onboardingChecklist.ratePrompt ? 'text-gray-600 line-through' : 'text-gray-900 font-medium'}`}>
+                      Rate a Prompt's Quality
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -858,6 +1025,13 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                         <p className="text-gray-600">Your polished content is ready</p>
                       </div>
                       <div className="flex items-center space-x-2">
+                        <button
+                          onClick={handleSavePrompt}
+                          className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                          title="Save Prompt"
+                        >
+                          <Save className="w-5 h-5" />
+                        </button>
                         <button
                           onClick={() => {/* Regenerate logic */}}
                           className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
