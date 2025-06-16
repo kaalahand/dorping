@@ -14,11 +14,13 @@ import {
   Clock
 } from 'lucide-react';
 import SignupModal from './components/SignupModal';
+import AboutUs from './components/AboutUs';
 
 function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [demoState, setDemoState] = useState('initial');
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  const [showAboutUs, setShowAboutUs] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<{
     name: string;
     price: string;
@@ -146,6 +148,11 @@ function App() {
     }
   ];
 
+  // Show About Us page if requested
+  if (showAboutUs) {
+    return <AboutUs onBack={() => setShowAboutUs(false)} />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Navigation */}
@@ -161,6 +168,12 @@ function App() {
               <span className="text-xl font-bold text-gray-900">Dorp AI</span>
             </div>
             <div className="flex items-center space-x-4">
+              <button 
+                onClick={() => setShowAboutUs(true)}
+                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                About Us
+              </button>
               <button 
                 onClick={scrollToPricing}
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
