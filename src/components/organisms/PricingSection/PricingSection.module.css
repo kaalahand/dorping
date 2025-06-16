@@ -1,0 +1,47 @@
+.section {
+  @apply py-20 bg-white;
+}
+
+.container {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.header {
+  @apply text-center mb-16;
+}
+
+.title {
+  @apply text-4xl font-bold text-gray-900 mb-4;
+}
+
+.subtitle {
+  @apply text-xl text-gray-600;
+}
+
+.grid {
+  @apply grid lg:grid-cols-4 gap-8;
+}
+
+@media (max-width: 640px) {
+  .section {
+    @apply py-12;
+  }
+  
+  .title {
+    @apply text-3xl;
+  }
+  
+  .subtitle {
+    @apply text-lg;
+  }
+  
+  .grid {
+    @apply grid-cols-1 gap-6;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .grid {
+    @apply grid-cols-2 gap-6;
+  }
+}
