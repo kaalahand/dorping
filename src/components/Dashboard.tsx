@@ -111,11 +111,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   ];
 
   const navigationItems = [
-    { id: 'create', icon: <Plus className="w-5 h-5" />, label: 'Create Prompt', active: true },
-    { id: 'history', icon: <History className="w-5 h-5" />, label: 'My Prompts' },
-    { id: 'marketplace', icon: <Store className="w-5 h-5" />, label: 'Vibe Marketplace', isPro: true },
-    { id: 'analytics', icon: <BarChart3 className="w-5 h-5" />, label: 'Analytics', isPro: true },
-    { id: 'upgrade', icon: <Crown className="w-5 h-5" />, label: 'Upgrade', isUpgrade: true }
+    { id: 'create', icon: <Plus className="w-6 h-6" />, label: 'Create Prompt', active: true },
+    { id: 'history', icon: <History className="w-6 h-6" />, label: 'My Prompts' },
+    { id: 'marketplace', icon: <Store className="w-6 h-6" />, label: 'Marketplace', isPro: true },
+    { id: 'analytics', icon: <BarChart3 className="w-6 h-6" />, label: 'Analytics', isPro: true },
+    { id: 'upgrade', icon: <Crown className="w-6 h-6" />, label: 'Upgrade', isUpgrade: true }
   ];
 
   const handleTaskSelect = (taskId: string) => {
@@ -158,7 +158,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex">
       {/* Sidebar Navigation */}
-      <div className={`bg-white border-r border-gray-200 transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'} flex flex-col`}>
+      <div className={`bg-white border-r border-gray-200 transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'} flex flex-col`}>
         {/* Logo and Collapse Button */}
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
           {!sidebarCollapsed && (
@@ -169,6 +169,15 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 className="w-8 h-8"
               />
               <span className="text-xl font-bold text-gray-900">Dorp AI</span>
+            </div>
+          )}
+          {sidebarCollapsed && (
+            <div className="flex items-center justify-center w-full">
+              <img 
+                src="/Dorp_logo_v1 (1)-Photoroom.png" 
+                alt="Dorp AI Logo" 
+                className="w-8 h-8"
+              />
             </div>
           )}
           <button
@@ -185,15 +194,18 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             {navigationItems.map((item) => (
               <li key={item.id}>
                 <button
-                  className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                  className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-3 rounded-lg transition-colors ${
                     item.active 
                       ? 'bg-blue-50 text-blue-700 border border-blue-200' 
                       : item.isUpgrade
                       ? 'text-purple-600 hover:bg-purple-50'
                       : 'text-gray-600 hover:bg-gray-50'
                   }`}
+                  title={sidebarCollapsed ? item.label : undefined}
                 >
-                  {item.icon}
+                  <div className={`${sidebarCollapsed ? 'w-6 h-6' : ''}`}>
+                    {item.icon}
+                  </div>
                   {!sidebarCollapsed && (
                     <>
                       <span className="font-medium">{item.label}</span>
@@ -227,7 +239,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           )}
 
           {/* User Profile */}
-          <div className="flex items-center space-x-3">
+          <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-3'}`}>
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
               <User className="w-4 h-4 text-white" />
             </div>
