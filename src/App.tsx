@@ -252,12 +252,12 @@ function App() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                From Idea to 
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"> Final Draft</span>
-                <br />in Seconds
+                Transform Your Thoughts into 
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"> Polished Action</span>
+                —Instantly
               </h1>
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Our AI assistant asks the right questions to transform your simple thoughts into perfectly structured, ready-to-use content.
+                Our AI assistant asks the right questions and delivers clear, compelling drafts tailored to your needs, so you can focus on what matters most.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <button 
