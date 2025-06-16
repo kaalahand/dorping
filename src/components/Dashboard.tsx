@@ -921,8 +921,9 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
               <div className="mt-6 text-center">
                 <button
                   onClick={resetWizard}
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-medium transition-colors"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 px-8 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center mx-auto"
                 >
+                  <Plus className="w-5 h-5 mr-2" />
                   Create Another Prompt
                 </button>
               </div>
