@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { X, Mail, Lock, Eye, EyeOff, ChevronDown } from 'lucide-react';
 
 interface SignupModalProps {
   isOpen: boolean;
@@ -17,6 +17,45 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, selectedPlan
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPlanDropdown, setShowPlanDropdown] = useState(false);
+  const [currentPlan, setCurrentPlan] = useState(selectedPlan);
+
+  // Available plans
+  const plans = [
+    {
+      name: "Free",
+      price: "$0",
+      period: "",
+      prompts: "50 prompts",
+      features: ["Basic templates", "Email support", "Export to PDF"]
+    },
+    {
+      name: "Starter",
+      price: "$4.99",
+      period: "/month",
+      prompts: "125 prompts",
+      features: ["All templates", "Priority support", "All export options", "Custom templates"]
+    },
+    {
+      name: "Pro",
+      price: "$19.99",
+      period: "/month",
+      prompts: "500 prompts",
+      features: ["Everything in Starter", "Advanced AI models", "Team collaboration", "API access", "Priority processing"]
+    },
+    {
+      name: "Unlimited",
+      price: "$49",
+      period: "/month",
+      prompts: "Unlimited prompts",
+      features: ["Everything in Pro", "White-label solution", "Custom integrations", "Dedicated support", "Advanced analytics"]
+    }
+  ];
+
+  // Update current plan when selectedPlan prop changes
+  React.useEffect(() => {
+    setCurrentPlan(selectedPlan);
+  }, [selectedPlan]);
 
   if (!isOpen) return null;
 
@@ -28,7 +67,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, selectedPlan
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     // Here you would integrate with your actual authentication system
-    console.log('Signup attempt:', { email, password, plan: selectedPlan });
+    console.log('Signup attempt:', { email, password, plan: currentPlan });
     
     setIsLoading(false);
     // For demo purposes, we'll just close the modal
@@ -37,7 +76,17 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, selectedPlan
 
   const handleGoogleSignup = () => {
     // Here you would integrate with Google OAuth
-    console.log('Google signup for plan:', selectedPlan);
+    console.log('Google signup for plan:', currentPlan);
+  };
+
+  const handlePlanSelect = (plan: typeof plans[0]) => {
+    setCurrentPlan({
+      name: plan.name,
+      price: plan.price,
+      period: plan.period,
+      prompts: plan.prompts
+    });
+    setShowPlanDropdown(false);
   };
 
   return (
@@ -57,20 +106,62 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, selectedPlan
           </button>
         </div>
 
-        {/* Selected Plan Display */}
-        {selectedPlan && (
-          <div className="mx-6 mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-gray-900">{selectedPlan.name} Plan</h3>
-                <p className="text-sm text-gray-600">{selectedPlan.prompts}</p>
-              </div>
-              <div className="text-right">
-                <div className="text-xl font-bold text-gray-900">
-                  {selectedPlan.price}
-                  <span className="text-sm font-normal text-gray-600">{selectedPlan.period}</span>
+        {/* Selected Plan Display with Dropdown */}
+        {currentPlan && (
+          <div className="mx-6 mt-6">
+            <div className="relative">
+              <button
+                onClick={() => setShowPlanDropdown(!showPlanDropdown)}
+                className="w-full p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-purple-100 transition-all"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="text-left">
+                    <h3 className="font-semibold text-gray-900">{currentPlan.name} Plan</h3>
+                    <p className="text-sm text-gray-600">{currentPlan.prompts}</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="text-right">
+                      <div className="text-xl font-bold text-gray-900">
+                        {currentPlan.price}
+                        <span className="text-sm font-normal text-gray-600">{currentPlan.period}</span>
+                      </div>
+                    </div>
+                    <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${showPlanDropdown ? 'rotate-180' : ''}`} />
+                  </div>
                 </div>
-              </div>
+              </button>
+
+              {/* Plan Dropdown */}
+              {showPlanDropdown && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-80 overflow-y-auto">
+                  {plans.map((plan, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handlePlanSelect(plan)}
+                      className={`w-full p-4 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 ${
+                        currentPlan.name === plan.name ? 'bg-blue-50 border-blue-200' : ''
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <h4 className="font-semibold text-gray-900">{plan.name}</h4>
+                          <p className="text-sm text-gray-600">{plan.prompts}</p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-lg font-bold text-gray-900">
+                            {plan.price}
+                            <span className="text-sm font-normal text-gray-600">{plan.period}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {plan.features.slice(0, 2).join(' • ')}
+                        {plan.features.length > 2 && ' • ...'}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -155,7 +246,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, selectedPlan
                   Creating Account...
                 </div>
               ) : (
-                'Create Account'
+                `Create Account - ${currentPlan?.name} Plan`
               )}
             </button>
           </form>
