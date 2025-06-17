@@ -31,15 +31,17 @@ import {
   ThumbsUp,
   ThumbsDown,
   Edit3,
+  Save,
   Search,
   Filter,
-  Calendar,
+  Grid,
+  List,
   Star,
   Play,
-  Edit,
   Trash2,
-  Save,
-  AlertTriangle
+  Calendar,
+  Clock,
+  Tag
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -52,16 +54,14 @@ interface SavedPrompt {
   taskType: string;
   taskIcon: React.ReactNode;
   taskColor: string;
-  originalPrompt: string;
-  answers: {
-    goal: string;
-    audience: string;
-    tone: string;
-  };
-  tags: string[];
+  originalRequest: string;
+  goal: string;
+  audience: string;
+  tone: string;
+  createdAt: Date;
+  lastUsed?: Date;
   rating: number;
-  lastUsed: string;
-  createdAt: string;
+  tags: string[];
   isStarred: boolean;
 }
 
@@ -78,23 +78,105 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [chatHistory, setChatHistory] = useState<Array<{id: number, message: string, sender: 'user' | 'ai', timestamp: Date}>>([]);
   const [generatedOutput, setGeneratedOutput] = useState('');
   const [isGeneratingFinal, setIsGeneratingFinal] = useState(false);
+  const [activeTab, setActiveTab] = useState('create');
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [promptName, setPromptName] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [taskFilter, setTaskFilter] = useState('all');
+  const [timeFilter, setTimeFilter] = useState('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showStarredOnly, setShowStarredOnly] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [promptToDelete, setPromptToDelete] = useState<string | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingPrompt, setEditingPrompt] = useState<SavedPrompt | null>(null);
   const [answers, setAnswers] = useState({
     goal: '',
     audience: '',
     tone: ''
   });
-  const [activeView, setActiveView] = useState('create');
-  const [showSaveModal, setShowSaveModal] = useState(false);
-  const [promptName, setPromptName] = useState('');
-  const [savedPrompts, setSavedPrompts] = useState<SavedPrompt[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTaskFilter, setSelectedTaskFilter] = useState('all');
-  const [selectedTimeFilter, setSelectedTimeFilter] = useState('all');
-  const [showStarredOnly, setShowStarredOnly] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [copySuccess, setCopySuccess] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [promptToDelete, setPromptToDelete] = useState<string | null>(null);
+
+  // Sample saved prompts data
+  const [savedPrompts, setSavedPrompts] = useState<SavedPrompt[]>([
+    {
+      id: '1',
+      name: 'Email-Follow up meeting-2025-01-15',
+      taskType: 'email',
+      taskIcon: <Mail className="w-5 h-5" />,
+      taskColor: 'from-blue-500 to-blue-600',
+      originalRequest: 'Write a follow-up email after our product demo meeting',
+      goal: 'Follow up on meeting and next steps',
+      audience: 'Enterprise clients',
+      tone: 'Professional',
+      createdAt: new Date('2025-01-15'),
+      lastUsed: new Date('2025-01-15'),
+      rating: 5,
+      tags: ['follow-up', 'enterprise', 'demo'],
+      isStarred: true
+    },
+    {
+      id: '2',
+      name: 'Content-Blog post about AI trends-2025-01-14',
+      taskType: 'content',
+      taskIcon: <PenTool className="w-5 h-5" />,
+      taskColor: 'from-pink-500 to-pink-600',
+      originalRequest: 'Create a blog post about emerging AI trends in 2025',
+      goal: 'Educate readers about AI developments',
+      audience: 'Tech enthusiasts and professionals',
+      tone: 'Informative yet engaging',
+      createdAt: new Date('2025-01-14'),
+      rating: 3,
+      tags: ['AI', 'trends', 'blog', '+1'],
+      isStarred: false
+    },
+    {
+      id: '3',
+      name: 'Master Prompt-Creative writing assistant-2025-01-13',
+      taskType: 'creative',
+      taskIcon: <Lightbulb className="w-5 h-5" />,
+      taskColor: 'from-green-500 to-green-600',
+      originalRequest: 'Create a master prompt for generating creative story ideas',
+      goal: 'Generate engaging story concepts',
+      audience: 'Writers and content creators',
+      tone: 'Creative and inspiring',
+      createdAt: new Date('2025-01-13'),
+      lastUsed: new Date('2025-01-13'),
+      rating: 5,
+      tags: ['creative', 'writing', 'master-prompt'],
+      isStarred: true
+    },
+    {
+      id: '4',
+      name: 'Business-Quarterly review presentation-2025-01-10',
+      taskType: 'business',
+      taskIcon: <Briefcase className="w-5 h-5" />,
+      taskColor: 'from-red-500 to-red-600',
+      originalRequest: 'Create an outline for Q4 business review presentation',
+      goal: 'Present quarterly performance',
+      audience: 'Executive team and stakeholders',
+      tone: 'Professional and data-driven',
+      createdAt: new Date('2025-01-10'),
+      rating: 4,
+      tags: ['business', 'quarterly', 'presentation'],
+      isStarred: false
+    },
+    {
+      id: '5',
+      name: 'Code-React component documentation-2025-01-08',
+      taskType: 'code',
+      taskIcon: <Code className="w-5 h-5" />,
+      taskColor: 'from-indigo-500 to-indigo-600',
+      originalRequest: 'Generate documentation for a React component library',
+      goal: 'Create comprehensive API docs',
+      audience: 'Developers using the component library',
+      tone: 'Technical and precise',
+      createdAt: new Date('2025-01-08'),
+      lastUsed: new Date('2025-01-08'),
+      rating: 5,
+      tags: ['code', 'react', 'documentation'],
+      isStarred: false
+    }
+  ]);
 
   // Onboarding checklist state
   const [onboardingChecklist, setOnboardingChecklist] = useState({
@@ -114,14 +196,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     },
     {
       id: 'document',
-      title: 'Create Content',
+      title: 'Create Document',
       icon: <FileText className="w-6 h-6" />,
       color: 'from-purple-500 to-purple-600',
       description: 'Reports, proposals, and structured documents'
     },
     {
       id: 'creative',
-      title: 'Create Master Prompts',
+      title: 'Creative Ideas',
       icon: <Lightbulb className="w-6 h-6" />,
       color: 'from-green-500 to-green-600',
       description: 'Brainstorming, creative writing, and ideation'
@@ -164,109 +246,12 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   ];
 
   const navigationItems = [
-    { id: 'create', icon: <Plus className="w-6 h-6" />, label: 'Create Prompt', active: activeView === 'create' },
-    { id: 'history', icon: <History className="w-6 h-6" />, label: 'My Prompts', active: activeView === 'history' },
+    { id: 'create', icon: <Plus className="w-6 h-6" />, label: 'Create Prompt', active: activeTab === 'create' },
+    { id: 'history', icon: <History className="w-6 h-6" />, label: 'My Prompts', active: activeTab === 'history' },
     { id: 'marketplace', icon: <Store className="w-6 h-6" />, label: 'Marketplace', isPro: true },
     { id: 'analytics', icon: <BarChart3 className="w-6 h-6" />, label: 'Analytics', isPro: true },
     { id: 'upgrade', icon: <Crown className="w-6 h-6" />, label: 'Upgrade', isUpgrade: true }
   ];
-
-  // Initialize with some sample saved prompts
-  useEffect(() => {
-    const samplePrompts: SavedPrompt[] = [
-      {
-        id: '1',
-        name: 'Email-Follow up meeting-2025-01-15',
-        taskType: 'email',
-        taskIcon: <Mail className="w-5 h-5" />,
-        taskColor: 'from-blue-500 to-blue-600',
-        originalPrompt: 'Write a follow-up email after our product demo meeting',
-        answers: {
-          goal: 'Follow up on the demo and schedule next steps',
-          audience: 'Enterprise clients',
-          tone: 'Professional and engaging'
-        },
-        tags: ['follow-up', 'enterprise', 'demo'],
-        rating: 5,
-        lastUsed: '1h ago',
-        createdAt: '2h ago',
-        isStarred: true
-      },
-      {
-        id: '2',
-        name: 'Content-Blog post about AI trends-2025-01-14',
-        taskType: 'content',
-        taskIcon: <PenTool className="w-5 h-5" />,
-        taskColor: 'from-pink-500 to-pink-600',
-        originalPrompt: 'Create a blog post about emerging AI trends in 2025',
-        answers: {
-          goal: 'Educate readers about latest AI developments',
-          audience: 'Tech enthusiasts and professionals',
-          tone: 'Informative yet accessible'
-        },
-        tags: ['AI', 'trends', 'blog', '+1'],
-        rating: 3,
-        lastUsed: '1d ago',
-        createdAt: '1d ago',
-        isStarred: false
-      },
-      {
-        id: '3',
-        name: 'Master Prompt-Creative writing assistant-2025-01-13',
-        taskType: 'creative',
-        taskIcon: <Lightbulb className="w-5 h-5" />,
-        taskColor: 'from-green-500 to-green-600',
-        originalPrompt: 'Create a master prompt for generating creative story ideas',
-        answers: {
-          goal: 'Generate unique and engaging story concepts',
-          audience: 'Writers and content creators',
-          tone: 'Inspiring and creative'
-        },
-        tags: ['creative', 'writing', 'master-prompt'],
-        rating: 5,
-        lastUsed: '6h ago',
-        createdAt: '2d ago',
-        isStarred: true
-      },
-      {
-        id: '4',
-        name: 'Business-Quarterly review presentation-2025-01-10',
-        taskType: 'business',
-        taskIcon: <Briefcase className="w-5 h-5" />,
-        taskColor: 'from-red-500 to-red-600',
-        originalPrompt: 'Create an outline for Q4 business review presentation',
-        answers: {
-          goal: 'Present quarterly results and future plans',
-          audience: 'Board members and stakeholders',
-          tone: 'Professional and data-driven'
-        },
-        tags: ['business', 'quarterly', 'presentation'],
-        rating: 4,
-        lastUsed: '5d ago',
-        createdAt: '5d ago',
-        isStarred: false
-      },
-      {
-        id: '5',
-        name: 'Code-React component documentation-2025-01-08',
-        taskType: 'code',
-        taskIcon: <Code className="w-5 h-5" />,
-        taskColor: 'from-indigo-500 to-indigo-600',
-        originalPrompt: 'Generate documentation for a React component library',
-        answers: {
-          goal: 'Create comprehensive API documentation',
-          audience: 'Developers using the component library',
-          tone: 'Technical and precise'
-        },
-        tags: ['code', 'react', 'documentation'],
-        rating: 5,
-        lastUsed: '1w ago',
-        createdAt: '1w ago',
-        isStarred: false
-      }
-    ];
-    setSavedPrompts(samplePrompts);
-  }, []);
 
   const handleTaskSelect = (taskId: string) => {
     setSelectedTask(taskId);
@@ -428,16 +413,13 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
     setAnswers({ goal: '', audience: '', tone: '' });
     setChatHistory([]);
     setGeneratedOutput('');
+    setIsEditMode(false);
+    setEditingPrompt(null);
   };
 
-  const handleCopyOutput = async () => {
-    try {
-      await navigator.clipboard.writeText(generatedOutput);
-      setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy text: ', err);
-    }
+  const handleCopyOutput = () => {
+    navigator.clipboard.writeText(generatedOutput);
+    // You could add a toast notification here
   };
 
   const handleDownloadOutput = () => {
@@ -456,30 +438,35 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
   };
 
   const handleSavePrompt = () => {
-    if (!selectedTask || !userPrompt) return;
+    if (!selectedTask || !userPrompt.trim()) return;
     
     const taskInfo = getSelectedTaskInfo();
-    if (!taskInfo) return;
+    const defaultName = `${taskInfo?.title}-${userPrompt.slice(0, 30).replace(/\s+/g, ' ').trim()}-${new Date().toISOString().split('T')[0]}`;
+    
+    setPromptName(defaultName);
+    setShowSaveModal(true);
+  };
 
-    // Generate default name if not provided
-    const defaultName = promptName.trim() || 
-      `${taskInfo.title}-${userPrompt.slice(0, 30).replace(/[^a-zA-Z0-9]/g, ' ').trim()}-${new Date().toISOString().split('T')[0]}`;
-
+  const confirmSavePrompt = () => {
+    if (!selectedTask || !userPrompt.trim()) return;
+    
+    const taskInfo = getSelectedTaskInfo();
     const newPrompt: SavedPrompt = {
       id: Date.now().toString(),
-      name: defaultName,
+      name: promptName || `${taskInfo?.title}-${userPrompt.slice(0, 30)}-${new Date().toISOString().split('T')[0]}`,
       taskType: selectedTask,
-      taskIcon: taskInfo.icon,
-      taskColor: taskInfo.color,
-      originalPrompt: userPrompt,
-      answers: { ...answers },
-      tags: [selectedTask, ...userPrompt.toLowerCase().split(' ').slice(0, 2)],
+      taskIcon: taskInfo?.icon || <FileText className="w-5 h-5" />,
+      taskColor: taskInfo?.color || 'from-gray-500 to-gray-600',
+      originalRequest: userPrompt,
+      goal: answers.goal,
+      audience: answers.audience,
+      tone: answers.tone,
+      createdAt: new Date(),
       rating: 0,
-      lastUsed: 'Just now',
-      createdAt: 'Just now',
+      tags: [],
       isStarred: false
     };
-
+    
     setSavedPrompts(prev => [newPrompt, ...prev]);
     setShowSaveModal(false);
     setPromptName('');
@@ -488,43 +475,21 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
     setOnboardingChecklist(prev => ({ ...prev, savePrompt: true }));
   };
 
-  const handleNavigationClick = (itemId: string) => {
-    if (itemId === 'create') {
-      setActiveView('create');
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    if (tabId === 'create') {
       resetWizard();
-    } else if (itemId === 'history') {
-      setActiveView('history');
     }
-    // Handle other navigation items as needed
   };
 
-  const handleRunPrompt = (prompt: SavedPrompt) => {
-    // Load the prompt data into the creation wizard
-    setSelectedTask(prompt.taskType);
-    setUserPrompt(prompt.originalPrompt);
-    setAnswers(prompt.answers);
-    setCurrentStep(3);
-    setShowQuestions(true);
-    setActiveView('create');
-    
-    // Update last used
+  const handleStarToggle = (promptId: string) => {
     setSavedPrompts(prev => 
-      prev.map(p => 
-        p.id === prompt.id 
-          ? { ...p, lastUsed: 'Just now' }
-          : p
+      prev.map(prompt => 
+        prompt.id === promptId 
+          ? { ...prompt, isStarred: !prompt.isStarred }
+          : prompt
       )
     );
-  };
-
-  const handleEditPrompt = (prompt: SavedPrompt) => {
-    // Load the prompt data into the creation wizard for editing
-    setSelectedTask(prompt.taskType);
-    setUserPrompt(prompt.originalPrompt);
-    setAnswers(prompt.answers);
-    setCurrentStep(3);
-    setShowQuestions(true);
-    setActiveView('create');
   };
 
   const handleDeletePrompt = (promptId: string) => {
@@ -534,191 +499,105 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
 
   const confirmDeletePrompt = () => {
     if (promptToDelete) {
-      setSavedPrompts(prev => prev.filter(p => p.id !== promptToDelete));
-      setShowDeleteModal(false);
+      setSavedPrompts(prev => prev.filter(prompt => prompt.id !== promptToDelete));
       setPromptToDelete(null);
     }
-  };
-
-  const cancelDeletePrompt = () => {
     setShowDeleteModal(false);
-    setPromptToDelete(null);
   };
 
-  const handleStarPrompt = (promptId: string) => {
+  const handleEditPrompt = (prompt: SavedPrompt) => {
+    setEditingPrompt(prompt);
+    setIsEditMode(true);
+    setSelectedTask(prompt.taskType);
+    setUserPrompt(prompt.originalRequest);
+    setAnswers({
+      goal: prompt.goal,
+      audience: prompt.audience,
+      tone: prompt.tone
+    });
+    setCurrentStep(3);
+    setShowQuestions(true);
+    setActiveTab('create');
+  };
+
+  const handleRunPrompt = (prompt: SavedPrompt) => {
+    // Update last used
     setSavedPrompts(prev => 
       prev.map(p => 
-        p.id === promptId 
-          ? { ...p, isStarred: !p.isStarred }
+        p.id === prompt.id 
+          ? { ...p, lastUsed: new Date() }
           : p
       )
     );
+    
+    // Load prompt and go to final output
+    setSelectedTask(prompt.taskType);
+    setUserPrompt(prompt.originalRequest);
+    setAnswers({
+      goal: prompt.goal,
+      audience: prompt.audience,
+      tone: prompt.tone
+    });
+    
+    // Simulate generating output
+    handleGenerateFinalOutput();
+    setActiveTab('create');
   };
 
+  // Filter prompts based on search and filters
   const filteredPrompts = savedPrompts.filter(prompt => {
-    // Search filter
     const matchesSearch = prompt.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         prompt.originalPrompt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         prompt.originalRequest.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          prompt.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     
-    // Task type filter
-    const matchesTask = selectedTaskFilter === 'all' || prompt.taskType === selectedTaskFilter;
+    const matchesTask = taskFilter === 'all' || prompt.taskType === taskFilter;
     
-    // Time filter
-    const matchesTime = selectedTimeFilter === 'all'; // For now, we'll implement this later with actual dates
+    const matchesTime = (() => {
+      if (timeFilter === 'all') return true;
+      const now = new Date();
+      const promptDate = prompt.createdAt;
+      const diffHours = (now.getTime() - promptDate.getTime()) / (1000 * 60 * 60);
+      
+      switch (timeFilter) {
+        case '24h': return diffHours <= 24;
+        case '7d': return diffHours <= 24 * 7;
+        case '30d': return diffHours <= 24 * 30;
+        case '90d': return diffHours <= 24 * 90;
+        default: return true;
+      }
+    })();
     
-    // Starred filter
     const matchesStarred = !showStarredOnly || prompt.isStarred;
     
     return matchesSearch && matchesTask && matchesTime && matchesStarred;
   });
 
-  const renderPromptCard = (prompt: SavedPrompt) => {
-    if (viewMode === 'list') {
-      return (
-        <div key={prompt.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4 flex-1 min-w-0">
-              <div className={`bg-gradient-to-r ${prompt.taskColor} p-2 rounded-lg text-white flex-shrink-0`}>
-                {prompt.taskIcon}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center space-x-2 mb-1">
-                  <h3 className="font-semibold text-gray-900 truncate">{prompt.name}</h3>
-                  {prompt.isStarred && <Star className="w-4 h-4 text-yellow-500 fill-current flex-shrink-0" />}
-                </div>
-                <p className="text-sm text-gray-600 truncate">{prompt.originalPrompt}</p>
-                <div className="flex items-center space-x-4 mt-2">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className={`w-3 h-3 ${i < prompt.rating ? 'fill-current' : ''}`} />
-                    ))}
-                  </div>
-                  <span className="text-xs text-gray-500">Used {prompt.lastUsed}</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2 flex-shrink-0">
-              <button
-                onClick={() => handleStarPrompt(prompt.id)}
-                className={`p-2 rounded-lg transition-colors ${
-                  prompt.isStarred 
-                    ? 'text-yellow-500 hover:text-yellow-600' 
-                    : 'text-gray-400 hover:text-yellow-500'
-                }`}
-              >
-                <Star className={`w-4 h-4 ${prompt.isStarred ? 'fill-current' : ''}`} />
-              </button>
-              <button
-                onClick={() => handleEditPrompt(prompt)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg transition-colors"
-              >
-                <Edit className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => handleDeletePrompt(prompt.id)}
-                className="p-2 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => handleRunPrompt(prompt)}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center"
-              >
-                <Play className="w-4 h-4 mr-1" />
-                Run
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    }
+  const getTimeAgo = (date: Date) => {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+    
+    if (diffHours < 1) return 'Just now';
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+    return `${Math.floor(diffDays / 30)}mo ago`;
+  };
 
-    return (
-      <div key={prompt.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <div className={`bg-gradient-to-r ${prompt.taskColor} p-2 rounded-lg text-white`}>
-              {prompt.taskIcon}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center space-x-2">
-                <h3 className="font-semibold text-gray-900 truncate">{prompt.name}</h3>
-                {prompt.isStarred && <Star className="w-4 h-4 text-yellow-500 fill-current" />}
-              </div>
-              <p className="text-sm text-gray-500">{prompt.createdAt}</p>
-            </div>
-          </div>
-          <button
-            onClick={() => handleStarPrompt(prompt.id)}
-            className={`p-1 rounded transition-colors ${
-              prompt.isStarred 
-                ? 'text-yellow-500 hover:text-yellow-600' 
-                : 'text-gray-400 hover:text-yellow-500'
-            }`}
-          >
-            <Star className={`w-4 h-4 ${prompt.isStarred ? 'fill-current' : ''}`} />
-          </button>
-        </div>
-
-        <div className="mb-4">
-          <p className="text-gray-700 text-sm line-clamp-3">{prompt.originalPrompt}</p>
-        </div>
-
-        <div className="flex flex-wrap gap-1 mb-4">
-          {prompt.tags.slice(0, 3).map((tag, index) => (
-            <span key={index} className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
-              {tag}
-            </span>
-          ))}
-          {prompt.tags.length > 3 && (
-            <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
-              +{prompt.tags.length - 3} more
-            </span>
-          )}
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="flex text-yellow-400">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className={`w-3 h-3 ${i < prompt.rating ? 'fill-current' : ''}`} />
-              ))}
-            </div>
-            <span className="text-xs text-gray-500">Used {prompt.lastUsed}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => handleEditPrompt(prompt)}
-              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg transition-colors"
-              title="Edit prompt"
-            >
-              <Edit className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => handleDeletePrompt(prompt.id)}
-              className="p-2 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
-              title="Delete prompt"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => handleRunPrompt(prompt)}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center"
-            >
-              <Play className="w-4 h-4 mr-1" />
-              Run
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star
+        key={i}
+        className={`w-4 h-4 ${i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+      />
+    ));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex overflow-hidden">
       {/* Sidebar Navigation */}
-      <div className={`bg-white border-r border-gray-200 transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'} flex flex-col`}>
+      <div className={`bg-white border-r border-gray-200 transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'} flex flex-col flex-shrink-0`}>
         {/* Logo and Collapse Button */}
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
           {!sidebarCollapsed ? (
@@ -753,7 +632,7 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
             {navigationItems.map((item) => (
               <li key={item.id}>
                 <button
-                  onClick={() => handleNavigationClick(item.id)}
+                  onClick={() => handleTabChange(item.id)}
                   className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-3 rounded-lg transition-colors ${
                     item.active 
                       ? 'bg-blue-50 text-blue-700 border border-blue-200' 
@@ -821,24 +700,24 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <header className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                {activeView === 'create' ? 'Prompt Studio' : 'My Prompts'}
+                {activeTab === 'create' ? 'Prompt Studio' : 'My Prompts'}
               </h1>
               <p className="text-gray-600">
-                {activeView === 'create' 
-                  ? 'Create your perfect prompt in three simple steps' 
+                {activeTab === 'create' 
+                  ? (isEditMode ? 'Edit your prompt and regenerate output' : 'Create your perfect prompt in three simple steps')
                   : 'Manage and reuse your saved prompts'
                 }
               </p>
             </div>
             
             {/* Onboarding Checklist */}
-            {showOnboarding && activeView === 'create' && (
+            {showOnboarding && activeTab === 'create' && (
               <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-4 max-w-sm">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-semibold text-gray-900">Getting Started</h3>
@@ -891,452 +770,476 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
         </header>
 
         {/* Content Area */}
-        <main className="flex-1 p-6">
-          {activeView === 'create' ? (
-            <div className="max-w-6xl mx-auto">
-              {/* Step Indicator */}
-              <div className="flex items-center justify-center mb-8">
-                <div className="flex items-center space-x-4">
-                  {[1, 2, 3].map((step) => (
-                    <React.Fragment key={step}>
-                      <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                        currentStep >= step 
-                          ? 'bg-blue-500 border-blue-500 text-white' 
-                          : 'border-gray-300 text-gray-400'
-                      }`}>
-                        {step}
-                      </div>
-                      {step < 3 && (
-                        <div className={`w-12 h-0.5 ${
-                          currentStep > step ? 'bg-blue-500' : 'bg-gray-300'
-                        }`}></div>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </div>
-              </div>
-
-              {/* Step Content */}
-              {!showFinalOutput ? (
-                <div className="bg-white rounded-2xl shadow-lg p-8">
-                  {/* Step 1: Select Task */}
-                  {currentStep === 1 && (
-                    <div>
-                      <div className="text-center mb-8">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-4">Select Your Task</h2>
-                        <p className="text-gray-600">Choose what you'd like to create today</p>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {tasks.map((task) => (
-                          <button
-                            key={task.id}
-                            onClick={() => handleTaskSelect(task.id)}
-                            className={`bg-gradient-to-r ${task.color} text-white p-6 rounded-xl hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl group`}
-                          >
-                            <div className="flex flex-col items-center text-center">
-                              <div className="mb-3 group-hover:scale-110 transition-transform">
-                                {task.icon}
-                              </div>
-                              <h3 className="font-semibold mb-2">{task.title}</h3>
-                              <p className="text-xs opacity-90">{task.description}</p>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Step 2: Enter Instruction */}
-                  {currentStep === 2 && selectedTask && (
-                    <div>
-                      <div className="text-center mb-8">
-                        <div className="flex items-center justify-center mb-4">
-                          <div className={`bg-gradient-to-r ${getSelectedTaskInfo()?.color} p-3 rounded-lg text-white mr-4`}>
-                            {getSelectedTaskInfo()?.icon}
+        <main className="flex-1 p-6 overflow-y-auto">
+          <div className="max-w-6xl mx-auto h-full">
+            {activeTab === 'create' ? (
+              <>
+                {/* Step Indicator */}
+                {!showFinalOutput && (
+                  <div className="flex items-center justify-center mb-8">
+                    <div className="flex items-center space-x-4">
+                      {[1, 2, 3].map((step) => (
+                        <React.Fragment key={step}>
+                          <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                            currentStep >= step 
+                              ? 'bg-blue-500 border-blue-500 text-white' 
+                              : 'border-gray-300 text-gray-400'
+                          }`}>
+                            {step}
                           </div>
-                          <div className="text-left">
-                            <h2 className="text-3xl font-bold text-gray-900">{getSelectedTaskInfo()?.title}</h2>
-                            <p className="text-gray-600">{getSelectedTaskInfo()?.description}</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-6">
-                        <div>
-                          <label className="block text-lg font-semibold text-gray-900 mb-3">
-                            What would you like to create?
-                          </label>
-                          <textarea
-                            value={userPrompt}
-                            onChange={(e) => setUserPrompt(e.target.value)}
-                            placeholder="Describe what you want to create. Be as specific or general as you'd like - our AI will ask follow-up questions to get the details right."
-                            className="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-lg"
-                          />
-                          <div className="flex justify-between items-center mt-2">
-                            <p className="text-sm text-gray-500">
-                              {userPrompt.length}/500 characters
-                            </p>
-                            <button
-                              onClick={resetWizard}
-                              className="text-sm text-gray-500 hover:text-gray-700 underline"
-                            >
-                              Start Over
-                            </button>
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={handleGenerateOutput}
-                          disabled={!userPrompt.trim() || isGenerating}
-                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 px-6 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
-                        >
-                          {isGenerating ? (
-                            <>
-                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                              Generating Questions...
-                            </>
-                          ) : (
-                            <>
-                              <Sparkles className="w-5 h-5 mr-2" />
-                              Generate Output
-                            </>
+                          {step < 3 && (
+                            <div className={`w-12 h-0.5 ${
+                              currentStep > step ? 'bg-blue-500' : 'bg-gray-300'
+                            }`}></div>
                           )}
-                        </button>
-                      </div>
+                        </React.Fragment>
+                      ))}
                     </div>
-                  )}
+                  </div>
+                )}
 
-                  {/* Step 3: Answer Questions */}
-                  {currentStep === 3 && showQuestions && (
-                    <div>
-                      <div className="text-center mb-8">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-4">Perfect Your Output</h2>
-                        <p className="text-gray-600">Answer these questions to get exactly what you need</p>
+                {/* Step Content */}
+                {!showFinalOutput ? (
+                  <div className="bg-white rounded-2xl shadow-lg p-8">
+                    {/* Step 1: Select Task */}
+                    {currentStep === 1 && (
+                      <div>
+                        <div className="text-center mb-8">
+                          <h2 className="text-3xl font-bold text-gray-900 mb-4">Select Your Task</h2>
+                          <p className="text-gray-600">Choose what you'd like to create today</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          {tasks.map((task) => (
+                            <button
+                              key={task.id}
+                              onClick={() => handleTaskSelect(task.id)}
+                              className={`bg-gradient-to-r ${task.color} text-white p-6 rounded-xl hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl group`}
+                            >
+                              <div className="flex flex-col items-center text-center">
+                                <div className="mb-3 group-hover:scale-110 transition-transform">
+                                  {task.icon}
+                                </div>
+                                <h3 className="font-semibold mb-2">{task.title}</h3>
+                                <p className="text-xs opacity-90">{task.description}</p>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
                       </div>
+                    )}
 
-                      <div className="space-y-6">
-                        {/* Goal Question */}
-                        <div className="bg-gray-50 rounded-lg p-6">
-                          <div className="flex items-center mb-4">
-                            <Target className="w-6 h-6 text-blue-500 mr-3" />
-                            <label className="text-lg font-semibold text-gray-900">
-                              💭 What's the goal?
-                            </label>
+                    {/* Step 2: Enter Instruction */}
+                    {currentStep === 2 && selectedTask && (
+                      <div>
+                        <div className="text-center mb-8">
+                          <div className="flex items-center justify-center mb-4">
+                            <div className={`bg-gradient-to-r ${getSelectedTaskInfo()?.color} p-3 rounded-lg text-white mr-4`}>
+                              {getSelectedTaskInfo()?.icon}
+                            </div>
+                            <div className="text-left">
+                              <h2 className="text-3xl font-bold text-gray-900">{getSelectedTaskInfo()?.title}</h2>
+                              <p className="text-gray-600">{getSelectedTaskInfo()?.description}</p>
+                            </div>
                           </div>
-                          <textarea
-                            value={answers.goal}
-                            onChange={(e) => handleAnswerChange('goal', e.target.value)}
-                            placeholder="What do you want to achieve with this content? (e.g., persuade, inform, entertain)"
-                            className="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                            maxLength={500}
-                          />
-                          <p className="text-sm text-gray-500 mt-1">{answers.goal.length}/500 words</p>
                         </div>
 
-                        {/* Audience Question */}
-                        <div className="bg-gray-50 rounded-lg p-6">
-                          <div className="flex items-center mb-4">
-                            <Users className="w-6 h-6 text-green-500 mr-3" />
-                            <label className="text-lg font-semibold text-gray-900">
-                              🎯 Who's the audience?
+                        <div className="space-y-6">
+                          <div>
+                            <label className="block text-lg font-semibold text-gray-900 mb-3">
+                              What would you like to create?
                             </label>
+                            <textarea
+                              value={userPrompt}
+                              onChange={(e) => setUserPrompt(e.target.value)}
+                              placeholder="Describe what you want to create. Be as specific or general as you'd like - our AI will ask follow-up questions to get the details right."
+                              className="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-lg"
+                            />
+                            <div className="flex justify-between items-center mt-2">
+                              <p className="text-sm text-gray-500">
+                                {userPrompt.length}/500 characters
+                              </p>
+                              <button
+                                onClick={resetWizard}
+                                className="text-sm text-gray-500 hover:text-gray-700 underline"
+                              >
+                                Start Over
+                              </button>
+                            </div>
                           </div>
-                          <textarea
-                            value={answers.audience}
-                            onChange={(e) => handleAnswerChange('audience', e.target.value)}
-                            placeholder="Who will be reading this? (e.g., colleagues, customers, friends, specific demographics)"
-                            className="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                            maxLength={500}
-                          />
-                          <p className="text-sm text-gray-500 mt-1">{answers.audience.length}/500 words</p>
-                        </div>
 
-                        {/* Tone Question */}
-                        <div className="bg-gray-50 rounded-lg p-6">
-                          <div className="flex items-center mb-4">
-                            <Palette className="w-6 h-6 text-purple-500 mr-3" />
-                            <label className="text-lg font-semibold text-gray-900">
-                              📝 What's the tone?
-                            </label>
-                          </div>
-                          <textarea
-                            value={answers.tone}
-                            onChange={(e) => handleAnswerChange('tone', e.target.value)}
-                            placeholder="How should this sound? (e.g., professional, casual, friendly, authoritative, humorous)"
-                            className="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                            maxLength={500}
-                          />
-                          <p className="text-sm text-gray-500 mt-1">{answers.tone.length}/500 words</p>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="flex space-x-4">
                           <button
-                            onClick={resetWizard}
-                            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-medium transition-colors"
+                            onClick={handleGenerateOutput}
+                            disabled={!userPrompt.trim() || isGenerating}
+                            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 px-6 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
                           >
-                            Start Over
-                          </button>
-                          <button
-                            onClick={handleGenerateFinalOutput}
-                            disabled={isGeneratingFinal}
-                            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
-                          >
-                            {isGeneratingFinal ? (
+                            {isGenerating ? (
                               <>
                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                                Generating Final Output...
+                                Generating Questions...
                               </>
                             ) : (
                               <>
                                 <Sparkles className="w-5 h-5 mr-2" />
-                                Generate Final Output
+                                Generate Output
                               </>
                             )}
                           </button>
                         </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                /* Final Output Split View */
-                <div className="grid lg:grid-cols-2 gap-6 h-[calc(100vh-200px)]">
-                  {/* Left Panel - Task Summary and Chat */}
-                  <div className="bg-white rounded-2xl shadow-lg flex flex-col">
-                    {/* Task Summary Header */}
-                    <div className="p-6 border-b border-gray-200">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center">
-                          <div className={`bg-gradient-to-r ${getSelectedTaskInfo()?.color} p-3 rounded-lg text-white mr-4`}>
-                            {getSelectedTaskInfo()?.icon}
-                          </div>
-                          <div>
-                            <h3 className="text-xl font-bold text-gray-900">{getSelectedTaskInfo()?.title}</h3>
-                            <p className="text-gray-600">Your prompt session</p>
-                          </div>
-                        </div>
-                        
-                        {/* Save Button */}
-                        <button
-                          onClick={() => setShowSaveModal(true)}
-                          className="bg-green-100 hover:bg-green-200 text-green-700 p-2 rounded-lg transition-colors flex items-center"
-                          title="Save this prompt"
-                        >
-                          <Save className="w-5 h-5" />
-                        </button>
-                      </div>
-                      
-                      {/* Task Details */}
-                      <div className="space-y-3">
-                        <div className="bg-gray-50 rounded-lg p-3">
-                          <h4 className="font-semibold text-gray-900 mb-1">Original Request:</h4>
-                          <p className="text-sm text-gray-700">{userPrompt}</p>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 gap-2">
-                          {answers.goal && (
-                            <div className="bg-blue-50 rounded-lg p-2">
-                              <span className="text-xs font-semibold text-blue-700">Goal:</span>
-                              <p className="text-xs text-blue-600">{answers.goal}</p>
-                            </div>
-                          )}
-                          {answers.audience && (
-                            <div className="bg-green-50 rounded-lg p-2">
-                              <span className="text-xs font-semibold text-green-700">Audience:</span>
-                              <p className="text-xs text-green-600">{answers.audience}</p>
-                            </div>
-                          )}
-                          {answers.tone && (
-                            <div className="bg-purple-50 rounded-lg p-2">
-                              <span className="text-xs font-semibold text-purple-700">Tone:</span>
-                              <p className="text-xs text-purple-600">{answers.tone}</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                    )}
 
-                    {/* Chat Section */}
-                    <div className="flex-1 flex flex-col">
-                      <div className="p-4 border-b border-gray-200">
-                        <h4 className="font-semibold text-gray-900">Chat with AI</h4>
-                        <p className="text-sm text-gray-600">Ask questions or request modifications</p>
+                    {/* Step 3: Answer Questions */}
+                    {currentStep === 3 && showQuestions && (
+                      <div>
+                        <div className="text-center mb-8">
+                          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                            {isEditMode ? 'Edit Your Prompt' : 'Perfect Your Output'}
+                          </h2>
+                          <p className="text-gray-600">
+                            {isEditMode ? 'Make changes to any section and regenerate' : 'Answer these questions to get exactly what you need'}
+                          </p>
+                        </div>
+
+                        <div className="space-y-6">
+                          {/* Original Instruction Section - Only show in edit mode */}
+                          {isEditMode && (
+                            <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
+                              <div className="flex items-center mb-4">
+                                <div className={`bg-gradient-to-r ${getSelectedTaskInfo()?.color} p-3 rounded-lg text-white mr-4`}>
+                                  {getSelectedTaskInfo()?.icon}
+                                </div>
+                                <div>
+                                  <h3 className="text-xl font-bold text-gray-900">{getSelectedTaskInfo()?.title}</h3>
+                                  <p className="text-gray-600">Original instruction</p>
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <label className="block text-lg font-semibold text-gray-900 mb-3">
+                                  What would you like to create?
+                                </label>
+                                <textarea
+                                  value={userPrompt}
+                                  onChange={(e) => setUserPrompt(e.target.value)}
+                                  placeholder="Describe what you want to create..."
+                                  className="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-lg"
+                                />
+                                <p className="text-sm text-gray-500 mt-1">
+                                  {userPrompt.length}/500 characters
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Goal Question */}
+                          <div className="bg-gray-50 rounded-lg p-6">
+                            <div className="flex items-center mb-4">
+                              <Target className="w-6 h-6 text-blue-500 mr-3" />
+                              <label className="text-lg font-semibold text-gray-900">
+                                💭 What's the goal?
+                              </label>
+                            </div>
+                            <textarea
+                              value={answers.goal}
+                              onChange={(e) => handleAnswerChange('goal', e.target.value)}
+                              placeholder="What do you want to achieve with this content? (e.g., persuade, inform, entertain)"
+                              className="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                              maxLength={500}
+                            />
+                            <p className="text-sm text-gray-500 mt-1">{answers.goal.length}/500 words</p>
+                          </div>
+
+                          {/* Audience Question */}
+                          <div className="bg-gray-50 rounded-lg p-6">
+                            <div className="flex items-center mb-4">
+                              <Users className="w-6 h-6 text-green-500 mr-3" />
+                              <label className="text-lg font-semibold text-gray-900">
+                                🎯 Who's the audience?
+                              </label>
+                            </div>
+                            <textarea
+                              value={answers.audience}
+                              onChange={(e) => handleAnswerChange('audience', e.target.value)}
+                              placeholder="Who will be reading this? (e.g., colleagues, customers, friends, specific demographics)"
+                              className="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                              maxLength={500}
+                            />
+                            <p className="text-sm text-gray-500 mt-1">{answers.audience.length}/500 words</p>
+                          </div>
+
+                          {/* Tone Question */}
+                          <div className="bg-gray-50 rounded-lg p-6">
+                            <div className="flex items-center mb-4">
+                              <Palette className="w-6 h-6 text-purple-500 mr-3" />
+                              <label className="text-lg font-semibold text-gray-900">
+                                📝 What's the tone?
+                              </label>
+                            </div>
+                            <textarea
+                              value={answers.tone}
+                              onChange={(e) => handleAnswerChange('tone', e.target.value)}
+                              placeholder="How should this sound? (e.g., professional, casual, friendly, authoritative, humorous)"
+                              className="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                              maxLength={500}
+                            />
+                            <p className="text-sm text-gray-500 mt-1">{answers.tone.length}/500 words</p>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex space-x-4">
+                            <button
+                              onClick={resetWizard}
+                              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-medium transition-colors"
+                            >
+                              Start Over
+                            </button>
+                            <button
+                              onClick={handleGenerateFinalOutput}
+                              disabled={isGeneratingFinal}
+                              className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
+                            >
+                              {isGeneratingFinal ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                  Generating Final Output...
+                                </>
+                              ) : (
+                                <>
+                                  <Sparkles className="w-5 h-5 mr-2" />
+                                  {isEditMode ? 'Regenerate Output' : 'Generate Final Output'}
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      
-                      {/* Chat Messages */}
-                      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                        {chatHistory.map((message) => (
-                          <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                              message.sender === 'user' 
-                                ? 'bg-blue-500 text-white' 
-                                : 'bg-gray-100 text-gray-900'
-                            }`}>
-                              <p className="text-sm">{message.message}</p>
-                              <p className={`text-xs mt-1 ${
-                                message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
+                    )}
+                  </div>
+                ) : (
+                  /* Final Output Split View */
+                  <div className="grid lg:grid-cols-2 gap-6 h-[calc(100vh-200px)]">
+                    {/* Left Panel - Task Summary and Chat */}
+                    <div className="bg-white rounded-2xl shadow-lg flex flex-col">
+                      {/* Task Summary Header */}
+                      <div className="p-6 border-b border-gray-200">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center">
+                            <div className={`bg-gradient-to-r ${getSelectedTaskInfo()?.color} p-3 rounded-lg text-white mr-4`}>
+                              {getSelectedTaskInfo()?.icon}
+                            </div>
+                            <div>
+                              <h3 className="text-xl font-bold text-gray-900">{getSelectedTaskInfo()?.title}</h3>
+                              <p className="text-gray-600">Your prompt session</p>
+                            </div>
+                          </div>
+                          
+                          {/* Save Button */}
+                          <button
+                            onClick={handleSavePrompt}
+                            className="flex items-center space-x-2 bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg transition-colors"
+                            title="Save this prompt"
+                          >
+                            <Save className="w-4 h-4" />
+                            <span className="text-sm font-medium">Save</span>
+                          </button>
+                        </div>
+                        
+                        {/* Task Details */}
+                        <div className="space-y-3">
+                          <div className="bg-gray-50 rounded-lg p-3">
+                            <h4 className="font-semibold text-gray-900 mb-1">Original Request:</h4>
+                            <p className="text-sm text-gray-700">{userPrompt}</p>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 gap-2">
+                            {answers.goal && (
+                              <div className="bg-blue-50 rounded-lg p-2">
+                                <span className="text-xs font-semibold text-blue-700">Goal:</span>
+                                <p className="text-xs text-blue-600">{answers.goal}</p>
+                              </div>
+                            )}
+                            {answers.audience && (
+                              <div className="bg-green-50 rounded-lg p-2">
+                                <span className="text-xs font-semibold text-green-700">Audience:</span>
+                                <p className="text-xs text-green-600">{answers.audience}</p>
+                              </div>
+                            )}
+                            {answers.tone && (
+                              <div className="bg-purple-50 rounded-lg p-2">
+                                <span className="text-xs font-semibold text-purple-700">Tone:</span>
+                                <p className="text-xs text-purple-600">{answers.tone}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Chat Section */}
+                      <div className="flex-1 flex flex-col">
+                        <div className="p-4 border-b border-gray-200">
+                          <h4 className="font-semibold text-gray-900">Chat with AI</h4>
+                          <p className="text-sm text-gray-600">Ask questions or request modifications</p>
+                        </div>
+                        
+                        {/* Chat Messages */}
+                        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                          {chatHistory.map((message) => (
+                            <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                              <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                                message.sender === 'user' 
+                                  ? 'bg-blue-500 text-white' 
+                                  : 'bg-gray-100 text-gray-900'
                               }`}>
-                                {message.timestamp.toLocaleTimeString()}
-                              </p>
+                                <p className="text-sm">{message.message}</p>
+                                <p className={`text-xs mt-1 ${
+                                  message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
+                                }`}>
+                                  {message.timestamp.toLocaleTimeString()}
+                                </p>
+                              </div>
                             </div>
+                          ))}
+                        </div>
+                        
+                        {/* Chat Input */}
+                        <div className="p-4 border-t border-gray-200">
+                          <div className="flex space-x-2">
+                            <input
+                              type="text"
+                              value={chatMessage}
+                              onChange={(e) => setChatMessage(e.target.value)}
+                              placeholder="Ask for modifications or improvements..."
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              onKeyPress={(e) => e.key === 'Enter' && handleSendChatMessage()}
+                            />
+                            <button
+                              onClick={handleSendChatMessage}
+                              disabled={!chatMessage.trim()}
+                              className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <Send className="w-4 h-4" />
+                            </button>
                           </div>
-                        ))}
+                        </div>
                       </div>
-                      
-                      {/* Chat Input */}
-                      <div className="p-4 border-t border-gray-200">
+                    </div>
+
+                    {/* Right Panel - Generated Output */}
+                    <div className="bg-white rounded-2xl shadow-lg flex flex-col">
+                      {/* Output Header */}
+                      <div className="p-6 border-b border-gray-200">
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h3 className="text-xl font-bold text-gray-900">Generated Output</h3>
+                            <p className="text-gray-600">Your polished content is ready</p>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => {/* Regenerate logic */}}
+                              className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                              title="Regenerate"
+                            >
+                              <RefreshCw className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => {/* Edit logic */}}
+                              className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                              title="Edit"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                        
+                        {/* Action Buttons */}
                         <div className="flex space-x-2">
-                          <input
-                            type="text"
-                            value={chatMessage}
-                            onChange={(e) => setChatMessage(e.target.value)}
-                            placeholder="Ask for modifications or improvements..."
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            onKeyPress={(e) => e.key === 'Enter' && handleSendChatMessage()}
-                          />
                           <button
-                            onClick={handleSendChatMessage}
-                            disabled={!chatMessage.trim()}
-                            className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={handleCopyOutput}
+                            className="flex-1 bg-blue-100 text-blue-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors flex items-center justify-center"
                           >
-                            <Send className="w-4 h-4" />
+                            <Copy className="w-4 h-4 mr-1" />
+                            Copy
                           </button>
+                          <button
+                            onClick={handleDownloadOutput}
+                            className="flex-1 bg-green-100 text-green-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-green-200 transition-colors flex items-center justify-center"
+                          >
+                            <Download className="w-4 h-4 mr-1" />
+                            Download
+                          </button>
+                          <button
+                            onClick={handleExportOutput}
+                            className="flex-1 bg-purple-100 text-purple-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-purple-200 transition-colors flex items-center justify-center"
+                          >
+                            <ExternalLink className="w-4 h-4 mr-1" />
+                            Export
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Output Content */}
+                      <div className="flex-1 overflow-y-auto p-6">
+                        <div className="prose prose-sm max-w-none">
+                          <pre className="whitespace-pre-wrap font-sans text-gray-900 leading-relaxed">
+                            {generatedOutput}
+                          </pre>
+                        </div>
+                      </div>
+
+                      {/* Rating Section */}
+                      <div className="p-6 border-t border-gray-200">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-semibold text-gray-900">Rate this output</h4>
+                            <p className="text-sm text-gray-600">Help us improve our AI</p>
+                          </div>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => {
+                                setOnboardingChecklist(prev => ({ ...prev, ratePrompt: true }));
+                              }}
+                              className="p-2 text-gray-400 hover:text-green-500 transition-colors"
+                              title="Good output"
+                            >
+                              <ThumbsUp className="w-5 h-5" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setOnboardingChecklist(prev => ({ ...prev, ratePrompt: true }));
+                              }}
+                              className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                              title="Needs improvement"
+                            >
+                              <ThumbsDown className="w-5 h-5" />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
+                )}
 
-                  {/* Right Panel - Generated Output */}
-                  <div className="bg-white rounded-2xl shadow-lg flex flex-col">
-                    {/* Output Header */}
-                    <div className="p-6 border-b border-gray-200">
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900">Generated Output</h3>
-                          <p className="text-gray-600">Your polished content is ready</p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => {/* Regenerate logic */}}
-                            className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                            title="Regenerate"
-                          >
-                            <RefreshCw className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => {/* Edit logic */}}
-                            className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                            title="Edit"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                      
-                      {/* Action Buttons */}
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={handleCopyOutput}
-                          className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center ${
-                            copySuccess 
-                              ? 'bg-green-100 text-green-700' 
-                              : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                          }`}
-                        >
-                          {copySuccess ? (
-                            <>
-                              <Check className="w-4 h-4 mr-1" />
-                              Copied!
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-4 h-4 mr-1" />
-                              Copy
-                            </>
-                          )}
-                        </button>
-                        <button
-                          onClick={handleDownloadOutput}
-                          className="flex-1 bg-green-100 text-green-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-green-200 transition-colors flex items-center justify-center"
-                        >
-                          <Download className="w-4 h-4 mr-1" />
-                          Download
-                        </button>
-                        <button
-                          onClick={handleExportOutput}
-                          className="flex-1 bg-purple-100 text-purple-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-purple-200 transition-colors flex items-center justify-center"
-                        >
-                          <ExternalLink className="w-4 h-4 mr-1" />
-                          Export
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Output Content */}
-                    <div className="flex-1 overflow-y-auto p-6">
-                      <div className="prose prose-sm max-w-none">
-                        <pre className="whitespace-pre-wrap font-sans text-gray-900 leading-relaxed">
-                          {generatedOutput}
-                        </pre>
-                      </div>
-                    </div>
-
-                    {/* Rating Section */}
-                    <div className="p-6 border-t border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-semibold text-gray-900">Rate this output</h4>
-                          <p className="text-sm text-gray-600">Help us improve our AI</p>
-                        </div>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => {
-                              setOnboardingChecklist(prev => ({ ...prev, ratePrompt: true }));
-                            }}
-                            className="p-2 text-gray-400 hover:text-green-500 transition-colors"
-                            title="Good output"
-                          >
-                            <ThumbsUp className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setOnboardingChecklist(prev => ({ ...prev, ratePrompt: true }));
-                            }}
-                            className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                            title="Needs improvement"
-                          >
-                            <ThumbsDown className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                {/* Start Over Button for Final Output */}
+                {showFinalOutput && (
+                  <div className="mt-6 text-center">
+                    <button
+                      onClick={resetWizard}
+                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-medium transition-colors"
+                    >
+                      Create Another Prompt
+                    </button>
                   </div>
-                </div>
-              )}
-
-              {/* Start Over Button for Final Output */}
-              {showFinalOutput && (
-                <div className="mt-6 text-center">
-                  <button
-                    onClick={resetWizard}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-medium transition-colors"
-                  >
-                    Create Another Prompt
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            /* My Prompts View */
-            <div className="max-w-7xl mx-auto">
-              {/* Search and Filter Bar */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-                  {/* Search */}
-                  <div className="flex-1 max-w-md">
-                    <div className="relative">
+                )}
+              </>
+            ) : (
+              /* My Prompts Tab */
+              <div className="space-y-6">
+                {/* Search and Filters */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
+                    {/* Search */}
+                    <div className="relative flex-1 max-w-md">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                       <input
                         type="text"
@@ -1346,129 +1249,259 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
-                  </div>
 
-                  {/* Filters */}
-                  <div className="flex items-center space-x-4">
-                    {/* Starred Filter */}
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id="starred-filter"
-                        checked={showStarredOnly}
-                        onChange={(e) => setShowStarredOnly(e.target.checked)}
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                      />
-                      <label htmlFor="starred-filter" className="text-sm font-medium text-gray-700 flex items-center">
-                        <Star className="w-4 h-4 mr-1 text-yellow-500" />
-                        Starred only
-                      </label>
-                    </div>
+                    {/* Filters */}
+                    <div className="flex items-center space-x-4">
+                      {/* Starred Filter */}
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="starred-filter"
+                          checked={showStarredOnly}
+                          onChange={(e) => setShowStarredOnly(e.target.checked)}
+                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <label htmlFor="starred-filter" className="flex items-center space-x-1 text-sm font-medium text-gray-700">
+                          <Star className="w-4 h-4" />
+                          <span>Starred only</span>
+                        </label>
+                      </div>
 
-                    {/* Task Filter */}
-                    <select
-                      value={selectedTaskFilter}
-                      onChange={(e) => setSelectedTaskFilter(e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                    >
-                      <option value="all">All Tasks</option>
-                      {tasks.map(task => (
-                        <option key={task.id} value={task.id}>{task.title}</option>
-                      ))}
-                    </select>
-
-                    {/* Time Filter */}
-                    <select
-                      value={selectedTimeFilter}
-                      onChange={(e) => setSelectedTimeFilter(e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                    >
-                      <option value="all">All Time</option>
-                      <option value="24h">Last 24 hours</option>
-                      <option value="7d">Last 7 days</option>
-                      <option value="30d">Last 30 days</option>
-                      <option value="90d">Last 90 days</option>
-                    </select>
-
-                    {/* View Mode Toggle */}
-                    <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                      <button
-                        onClick={() => setViewMode('grid')}
-                        className={`p-2 rounded-md transition-colors ${
-                          viewMode === 'grid' 
-                            ? 'bg-white text-blue-600 shadow-sm' 
-                            : 'text-gray-600 hover:text-gray-900'
-                        }`}
+                      {/* Task Filter */}
+                      <select
+                        value={taskFilter}
+                        onChange={(e) => setTaskFilter(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                       >
-                        <div className="w-4 h-4 grid grid-cols-2 gap-0.5">
-                          <div className="bg-current rounded-sm"></div>
-                          <div className="bg-current rounded-sm"></div>
-                          <div className="bg-current rounded-sm"></div>
-                          <div className="bg-current rounded-sm"></div>
-                        </div>
-                      </button>
-                      <button
-                        onClick={() => setViewMode('list')}
-                        className={`p-2 rounded-md transition-colors ${
-                          viewMode === 'list' 
-                            ? 'bg-white text-blue-600 shadow-sm' 
-                            : 'text-gray-600 hover:text-gray-900'
-                        }`}
+                        <option value="all">All Tasks</option>
+                        {tasks.map(task => (
+                          <option key={task.id} value={task.id}>{task.title}</option>
+                        ))}
+                      </select>
+
+                      {/* Time Filter */}
+                      <select
+                        value={timeFilter}
+                        onChange={(e) => setTimeFilter(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                       >
-                        <div className="w-4 h-4 flex flex-col space-y-1">
-                          <div className="bg-current h-0.5 rounded"></div>
-                          <div className="bg-current h-0.5 rounded"></div>
-                          <div className="bg-current h-0.5 rounded"></div>
-                        </div>
-                      </button>
+                        <option value="all">All Time</option>
+                        <option value="24h">Last 24 hours</option>
+                        <option value="7d">Last 7 days</option>
+                        <option value="30d">Last 30 days</option>
+                        <option value="90d">Last 90 days</option>
+                      </select>
+
+                      {/* View Toggle */}
+                      <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                        <button
+                          onClick={() => setViewMode('grid')}
+                          className={`p-2 rounded-md transition-colors ${
+                            viewMode === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                          }`}
+                        >
+                          <Grid className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setViewMode('list')}
+                          className={`p-2 rounded-md transition-colors ${
+                            viewMode === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                          }`}
+                        >
+                          <List className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Results Count */}
-              <div className="mb-6">
-                <p className="text-gray-600">
-                  {filteredPrompts.length} prompt{filteredPrompts.length !== 1 ? 's' : ''} found
-                  {showStarredOnly && ' (starred only)'}
-                </p>
-              </div>
-
-              {/* Prompts Grid/List */}
-              <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
-                {filteredPrompts.map(renderPromptCard)}
-              </div>
-
-              {/* Empty State */}
-              {filteredPrompts.length === 0 && (
-                <div className="text-center py-12">
-                  <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Search className="w-8 h-8 text-gray-400" />
+                  {/* Results Count */}
+                  <div className="mt-4 text-sm text-gray-600">
+                    {filteredPrompts.length} prompt{filteredPrompts.length !== 1 ? 's' : ''} found
+                    {showStarredOnly && ' (starred only)'}
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No prompts found</h3>
-                  <p className="text-gray-600 mb-6">
-                    {searchQuery || selectedTaskFilter !== 'all' || selectedTimeFilter !== 'all' || showStarredOnly
-                      ? 'Try adjusting your search or filters'
-                      : 'Create your first prompt to get started'
-                    }
-                  </p>
-                  <button
-                    onClick={() => {
-                      setActiveView('create');
-                      resetWizard();
-                    }}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-                  >
-                    Create Your First Prompt
-                  </button>
                 </div>
-              )}
-            </div>
-          )}
+
+                {/* Prompts Grid/List */}
+                {filteredPrompts.length > 0 ? (
+                  <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
+                    {filteredPrompts.map((prompt) => (
+                      <div
+                        key={prompt.id}
+                        className={`bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow ${
+                          viewMode === 'list' ? 'flex items-center p-4' : 'p-6'
+                        }`}
+                      >
+                        {viewMode === 'grid' ? (
+                          <>
+                            {/* Grid View */}
+                            <div className="flex items-center justify-between mb-4">
+                              <div className={`bg-gradient-to-r ${prompt.taskColor} p-2 rounded-lg text-white`}>
+                                {prompt.taskIcon}
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={() => handleStarToggle(prompt.id)}
+                                  className={`p-1 rounded transition-colors ${
+                                    prompt.isStarred ? 'text-yellow-500 hover:text-yellow-600' : 'text-gray-400 hover:text-yellow-500'
+                                  }`}
+                                >
+                                  <Star className={`w-4 h-4 ${prompt.isStarred ? 'fill-current' : ''}`} />
+                                </button>
+                                <button
+                                  onClick={() => handleEditPrompt(prompt)}
+                                  className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                                  title="Edit prompt"
+                                >
+                                  <Edit3 className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeletePrompt(prompt.id)}
+                                  className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                                  title="Delete prompt"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+
+                            <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{prompt.name}</h3>
+                            <p className="text-sm text-gray-600 mb-4 line-clamp-3">{prompt.originalRequest}</p>
+
+                            <div className="flex flex-wrap gap-1 mb-4">
+                              {prompt.tags.slice(0, 3).map((tag, index) => (
+                                <span
+                                  key={index}
+                                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                              {prompt.tags.length > 3 && (
+                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                  +{prompt.tags.length - 3}
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center space-x-1">
+                                {renderStars(prompt.rating)}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {getTimeAgo(prompt.createdAt)}
+                              </div>
+                            </div>
+
+                            {prompt.lastUsed && (
+                              <div className="text-xs text-gray-500 mb-4">
+                                Used {getTimeAgo(prompt.lastUsed)}
+                              </div>
+                            )}
+
+                            <button
+                              onClick={() => handleRunPrompt(prompt)}
+                              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
+                            >
+                              <Play className="w-4 h-4 mr-2" />
+                              Run
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            {/* List View */}
+                            <div className={`bg-gradient-to-r ${prompt.taskColor} p-3 rounded-lg text-white mr-4 flex-shrink-0`}>
+                              {prompt.taskIcon}
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between mb-2">
+                                <h3 className="font-semibold text-gray-900 truncate">{prompt.name}</h3>
+                                <div className="flex items-center space-x-2 ml-4">
+                                  <button
+                                    onClick={() => handleStarToggle(prompt.id)}
+                                    className={`p-1 rounded transition-colors ${
+                                      prompt.isStarred ? 'text-yellow-500 hover:text-yellow-600' : 'text-gray-400 hover:text-yellow-500'
+                                    }`}
+                                  >
+                                    <Star className={`w-4 h-4 ${prompt.isStarred ? 'fill-current' : ''}`} />
+                                  </button>
+                                  <button
+                                    onClick={() => handleEditPrompt(prompt)}
+                                    className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                                    title="Edit prompt"
+                                  >
+                                    <Edit3 className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeletePrompt(prompt.id)}
+                                    className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                                    title="Delete prompt"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                              
+                              <p className="text-sm text-gray-600 mb-2 line-clamp-2">{prompt.originalRequest}</p>
+                              
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-4">
+                                  <div className="flex items-center space-x-1">
+                                    {renderStars(prompt.rating)}
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    {getTimeAgo(prompt.createdAt)}
+                                  </div>
+                                  {prompt.lastUsed && (
+                                    <div className="text-xs text-gray-500">
+                                      Used {getTimeAgo(prompt.lastUsed)}
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                <button
+                                  onClick={() => handleRunPrompt(prompt)}
+                                  className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-lg text-sm font-medium transition-colors flex items-center"
+                                >
+                                  <Play className="w-3 h-3 mr-1" />
+                                  Run
+                                </button>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <History className="w-12 h-12 text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No prompts found</h3>
+                    <p className="text-gray-600 mb-6">
+                      {showStarredOnly 
+                        ? "You haven't starred any prompts yet. Star your favorite prompts to find them easily."
+                        : searchQuery || taskFilter !== 'all' || timeFilter !== 'all'
+                        ? "Try adjusting your search or filters to find what you're looking for."
+                        : "Create your first prompt to get started with Dorp AI."
+                      }
+                    </p>
+                    <button
+                      onClick={() => handleTabChange('create')}
+                      className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
+                    >
+                      Create Your First Prompt
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </main>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-gray-200 px-6 py-4">
+        <footer className="bg-white border-t border-gray-200 px-6 py-4 flex-shrink-0">
           <div className="flex items-center justify-between text-sm text-gray-500">
             <div className="flex items-center space-x-4">
               <span>&copy; 2025 Dorp AI. All rights reserved.</span>
@@ -1488,59 +1521,56 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
             <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Save Prompt</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Save Prompt</h3>
                 <button
                   onClick={() => setShowSaveModal(false)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="text-gray-400 hover:text-gray-600"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Prompt Name (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={promptName}
-                    onChange={(e) => setPromptName(e.target.value)}
-                    placeholder="Enter a custom name or leave blank for auto-generated"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-blue-500 rounded-full p-1 flex-shrink-0 mt-0.5">
-                      <Check className="w-3 h-3 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-blue-900 mb-1">Save for Future Use</h4>
-                      <p className="text-sm text-blue-700">
-                        Saved prompts can be reused and are available in the "My Prompts" section. 
-                        You can run them again or edit them anytime.
-                      </p>
-                    </div>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Prompt Name (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={promptName}
+                  onChange={(e) => setPromptName(e.target.value)}
+                  placeholder="Leave empty for auto-generated name"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div className="flex items-start space-x-3">
+                  <div className="bg-blue-500 rounded-full p-1 flex-shrink-0 mt-0.5">
+                    <Check className="w-3 h-3 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-blue-900 mb-1">Saved prompts can be reused!</h4>
+                    <p className="text-sm text-blue-700">
+                      Your saved prompts will be available in the "My Prompts" section where you can run them again or edit them anytime.
+                    </p>
                   </div>
                 </div>
-
-                <div className="flex space-x-3">
-                  <button
-                    onClick={() => setShowSaveModal(false)}
-                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSavePrompt}
-                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-medium transition-colors"
-                  >
-                    Save Prompt
-                  </button>
-                </div>
+              </div>
+              
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setShowSaveModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmSavePrompt}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Save Prompt
+                </button>
               </div>
             </div>
           </div>
@@ -1552,34 +1582,32 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
             <div className="p-6">
-              <div className="flex items-center mb-6">
+              <div className="flex items-center mb-4">
                 <div className="bg-red-100 rounded-full p-3 mr-4">
-                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                  <Trash2 className="w-6 h-6 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">Delete Prompt</h3>
-                  <p className="text-gray-600">This action cannot be undone</p>
+                  <h3 className="text-lg font-semibold text-gray-900">Delete Prompt</h3>
+                  <p className="text-sm text-gray-600">This action cannot be undone</p>
                 </div>
               </div>
-
+              
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <p className="text-red-800 font-medium mb-2">⚠️ Warning</p>
-                <p className="text-red-700 text-sm">
-                  This prompt will be permanently deleted and cannot be recovered. 
-                  All associated data including the original request, answers, and any ratings will be lost forever.
+                <p className="text-sm text-red-800">
+                  This prompt will be permanently deleted and cannot be recovered. All associated data including the original request, answers, and any ratings will be lost forever.
                 </p>
               </div>
-
+              
               <div className="flex space-x-3">
                 <button
-                  onClick={cancelDeletePrompt}
-                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium transition-colors"
+                  onClick={() => setShowDeleteModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDeletePrompt}
-                  className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg font-medium transition-colors"
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                 >
                   Delete Forever
                 </button>
