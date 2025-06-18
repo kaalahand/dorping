@@ -295,8 +295,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, user }) => {
         tags: ['code', 'python', 'optimization', 'review'],
         isFavorite: true
       }
-    ];
-    setSavedPrompts(samplePrompts);
+      ];
+      setSavedPrompts(samplePrompts);
     } else {
       // For new users, start with empty prompts
       setSavedPrompts([]);

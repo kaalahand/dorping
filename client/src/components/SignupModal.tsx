@@ -5,7 +5,7 @@ interface SignupModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSwitchToSignIn: () => void;
-  onSuccess: () => void;
+  onSuccess: (userData?: any) => void;
   selectedPlan: {
     name: string;
     price: string;

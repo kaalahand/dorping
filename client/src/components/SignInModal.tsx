@@ -5,7 +5,7 @@ interface SignInModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSwitchToSignup: () => void;
-  onSuccess: () => void;
+  onSuccess: (userData?: any) => void;
 }
 
 const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSwitchToSignup, onSuccess }) => {
@@ -41,7 +41,7 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSwitchToSi
 
       if (response.ok) {
         console.log('Login successful:', data);
-        onSuccess();
+        onSuccess(data.user);
       } else {
         console.error('Login failed:', data.message);
         setError(data.message || 'Login failed');

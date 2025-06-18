@@ -42,6 +42,14 @@ function App() {
     period: string;
     prompts: string;
   } | null>(null);
+  const [user, setUser] = useState<{
+    id: number;
+    username: string;
+    email: string;
+    plan: string;
+    promptsUsed: number;
+    promptsLimit: number;
+  } | null>(null);
 
   // Animated demo cycle
   useEffect(() => {
@@ -102,10 +110,13 @@ function App() {
     setIsSignInModalOpen(true);
   };
 
-  const handleSuccessfulAuth = () => {
+  const handleSuccessfulAuth = (userData?: any) => {
     setIsSignupModalOpen(false);
     setIsSignInModalOpen(false);
     setShowDashboard(true);
+    if (userData) {
+      setUser(userData);
+    }
   };
 
   const handleLogout = () => {
@@ -304,7 +315,7 @@ function App() {
     return (
       <>
         <SEOHead {...getSEOData()} />
-        <Dashboard onLogout={handleLogout} />
+        <Dashboard onLogout={handleLogout} user={user || undefined} />
       </>
     );
   }
