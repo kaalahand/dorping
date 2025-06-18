@@ -1,8 +1,11 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import passport from "passport";
+import session from "express-session";
 import { storage } from "./storage";
 import { insertUserSchema } from "@shared/schema";
 import { z } from "zod";
+import { setupGoogleAuth } from "./googleAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
