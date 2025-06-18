@@ -21,6 +21,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToSi
   const [isLoading, setIsLoading] = useState(false);
   const [showPlanDropdown, setShowPlanDropdown] = useState(false);
   const [currentPlan, setCurrentPlan] = useState(selectedPlan);
+  const [error, setError] = useState('');
 
   // Available plans
   const plans = [
@@ -64,6 +65,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToSi
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
     
     try {
       console.log('Signup attempt:', { email, password, plan: currentPlan });
@@ -87,11 +89,11 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToSi
         onSuccess();
       } else {
         console.error('Signup failed:', data.message);
-        alert(data.message || 'Signup failed');
+        setError(data.message || 'Signup failed');
       }
     } catch (error) {
       console.error('Signup error:', error);
-      alert('Network error. Please try again.');
+      setError('Network error. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -193,6 +195,12 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToSi
 
         {/* Signup Form */}
         <div className="p-6">
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email Field */}
             <div>

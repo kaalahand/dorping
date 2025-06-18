@@ -14,12 +14,14 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSwitchToSi
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState('');
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
     
     try {
       console.log('Sign in attempt:', { email, password, rememberMe });
@@ -42,11 +44,11 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSwitchToSi
         onSuccess();
       } else {
         console.error('Login failed:', data.message);
-        alert(data.message || 'Login failed');
+        setError(data.message || 'Login failed');
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert('Network error. Please try again.');
+      setError('Network error. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -83,6 +85,12 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSwitchToSi
 
         {/* Sign In Form */}
         <div className="p-6">
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email Field */}
             <div>
