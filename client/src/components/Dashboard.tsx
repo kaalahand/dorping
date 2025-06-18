@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Plus, 
   History, 
@@ -36,6 +36,8 @@ import {
   Filter,
   Calendar,
   Clock,
+  CreditCard,
+  ChevronDown,
   Play,
   Star,
   Trash2,
@@ -98,6 +100,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [selectedTimeFilter, setSelectedTimeFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name' | 'lastUsed'>('newest');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [showFilters, setShowFilters] = useState(false);
 
   // Onboarding checklist state
