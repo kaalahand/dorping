@@ -47,6 +47,25 @@ function App() {
     prompts: string;
   } | null>(null);
 
+  // Carousel state for main heading
+  const [currentHeadingIndex, setCurrentHeadingIndex] = useState(0);
+  
+  // Carousel text options
+  const headingTexts = [
+    {
+      text: "Use Dorp for all your Everyday AI use",
+      highlight: "Everyday AI use"
+    },
+    {
+      text: "Transform Your Thoughts into Reality—Instantly",
+      highlight: "Reality"
+    },
+    {
+      text: "An AI that actually understands you & easy to use.",
+      highlight: "understands you"
+    }
+  ];
+
   // Animated demo cycle
   useEffect(() => {
     const interval = setInterval(() => {
@@ -61,6 +80,17 @@ function App() {
 
     return () => clearInterval(interval);
   }, [demoState]);
+
+  // Carousel effect for heading
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHeadingIndex((prevIndex) => 
+        (prevIndex + 1) % headingTexts.length
+      );
+    }, 4000); // Change every 4 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   const scrollToPricing = () => {
     const pricingSection = document.getElementById('pricing');
@@ -215,24 +245,6 @@ function App() {
     }
   ];
 
-  const statistics = [
-    {
-      value: "78%",
-      label: "Success Rate",
-      description: "Aligns with AI adoption statistics and realistic conversion expectations"
-    },
-    {
-      value: "8.1",
-      label: "Hours Saved Weekly",
-      description: "Comes directly from our research showing content creators lose this much time to prompt iteration"
-    },
-    {
-      value: "$6.5B",
-      label: "Market Size",
-      description: "Uses actual market size projections to show industry momentum"
-    }
-  ];
-
   // Task options for the homepage
   const homepageTasks = [
     {
@@ -292,6 +304,38 @@ function App() {
       description: 'Plans, strategies, and business documents'
     }
   ];
+
+  const statistics = [
+    {
+      value: "78%",
+      label: "Success Rate",
+      description: "Aligns with AI adoption statistics and realistic conversion expectations"
+    },
+    {
+      value: "8.1",
+      label: "Hours Saved Weekly",
+      description: "Comes directly from our research showing content creators lose this much time to prompt iteration"
+    },
+    {
+      value: "$6.5B",
+      label: "Market Size",
+      description: "Uses actual market size projections to show industry momentum"
+    }
+  ];
+
+  // Helper function to render heading with highlighted text
+  const renderHeading = (text: string, highlight: string) => {
+    const parts = text.split(highlight);
+    return (
+      <>
+        {parts[0]}
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+          {highlight}
+        </span>
+        {parts[1]}
+      </>
+    );
+  };
 
   // SEO data for different pages
   const getSEOData = () => {
@@ -510,10 +554,8 @@ function App() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                  Transform Your Thoughts into 
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"> Reality</span>
-                  —Instantly
+                <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6 transition-all duration-500 ease-in-out">
+                  {renderHeading(headingTexts[currentHeadingIndex].text, headingTexts[currentHeadingIndex].highlight)}
                 </h1>
                 <p className="text-xl text-gray-600 mb-8 leading-relaxed">
                   We understand your prompt, ask the right followup question and deliver clear, compelling drafts tailored to your needs, so you can focus on what matters most.
