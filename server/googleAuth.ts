@@ -9,8 +9,8 @@ export function setupGoogleAuth(app: Express) {
   // Google OAuth Strategy
   passport.use(new GoogleStrategy({
     clientID: GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    callbackURL: "/auth/google/callback"
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    callbackURL: `https://${process.env.REPLIT_DOMAINS}/auth/google/callback`
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
