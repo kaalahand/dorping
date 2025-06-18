@@ -908,7 +908,7 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
 
             {/* Profile Dropdown */}
             {showProfileDropdown && (
-              <div className={`absolute ${sidebarCollapsed ? 'left-full ml-2 bottom-0' : 'top-full mt-2'} w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50`}>
+              <div className={`absolute ${sidebarCollapsed ? 'left-full ml-2 bottom-0' : 'bottom-full mb-2'} w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50`}>
                 <button
                   onClick={() => {
                     setShowProfileDropdown(false);
