@@ -65,15 +65,36 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToSi
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Here you would integrate with your actual authentication system
-    console.log('Signup attempt:', { email, password, plan: currentPlan });
-    
-    setIsLoading(false);
-    // Redirect to dashboard on successful signup
-    onSuccess();
+    try {
+      console.log('Signup attempt:', { email, password, plan: currentPlan });
+      
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          plan: currentPlan
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('Signup successful:', data);
+        onSuccess();
+      } else {
+        console.error('Signup failed:', data.message);
+        alert(data.message || 'Signup failed');
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      alert('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleSignup = () => {

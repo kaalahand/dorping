@@ -21,15 +21,35 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSwitchToSi
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Here you would integrate with your actual authentication system
-    console.log('Sign in attempt:', { email, password, rememberMe });
-    
-    setIsLoading(false);
-    // Redirect to dashboard on successful sign in
-    onSuccess();
+    try {
+      console.log('Sign in attempt:', { email, password, rememberMe });
+      
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('Login successful:', data);
+        onSuccess();
+      } else {
+        console.error('Login failed:', data.message);
+        alert(data.message || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleSignIn = () => {
