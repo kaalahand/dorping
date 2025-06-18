@@ -581,7 +581,7 @@ function App() {
               <div className="relative">
                 <div className="bg-white rounded-2xl shadow-2xl p-6 transform transition-all duration-500 hover:scale-105">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Everyday AI use</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">What do you want to do today ? </h3>
                     <div className="flex space-x-2">
                       <div className="w-3 h-3 bg-red-400 rounded-full"></div>
                       <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
