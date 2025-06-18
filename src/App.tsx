@@ -50,7 +50,7 @@ function App() {
   // Carousel state for main heading
   const [currentHeadingIndex, setCurrentHeadingIndex] = useState(0);
   
-  // Carousel text options
+  // Carousel text options - structured to maintain consistent layout
   const headingTexts = [
     {
       text: "Use Dorp for all your Everyday AI use",
@@ -554,9 +554,12 @@ function App() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6 transition-all duration-500 ease-in-out">
-                  {renderHeading(headingTexts[currentHeadingIndex].text, headingTexts[currentHeadingIndex].highlight)}
-                </h1>
+                {/* Fixed height container to prevent layout shifts */}
+                <div className="h-[200px] lg:h-[240px] flex items-center">
+                  <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight transition-all duration-500 ease-in-out">
+                    {renderHeading(headingTexts[currentHeadingIndex].text, headingTexts[currentHeadingIndex].highlight)}
+                  </h1>
+                </div>
                 <p className="text-xl text-gray-600 mb-8 leading-relaxed">
                   We understand your prompt, ask the right followup question and deliver clear, compelling drafts tailored to your needs, so you can focus on what matters most.
                 </p>
