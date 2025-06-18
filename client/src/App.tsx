@@ -121,7 +121,63 @@ function App() {
 
   const handleLogout = () => {
     setShowDashboard(false);
+    setUser(null);
+    localStorage.removeItem('currentUser');
+    // Logout from session if using OAuth
+    window.location.href = '/api/auth/logout';
   };
+
+  // Check authentication on app load
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const response = await fetch('/api/auth/check');
+        const data = await response.json();
+        
+        if (data.authenticated) {
+          setUser(data.user);
+          setShowDashboard(true);
+        } else {
+          // Check for stored user (fallback for email auth)
+          const storedUser = localStorage.getItem('currentUser');
+          if (storedUser) {
+            try {
+              const userData = JSON.parse(storedUser);
+              setUser(userData);
+              setShowDashboard(true);
+            } catch (error) {
+              console.error('Error parsing stored user:', error);
+              localStorage.removeItem('currentUser');
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+        // Fallback to localStorage check
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+          try {
+            const userData = JSON.parse(storedUser);
+            setUser(userData);
+            setShowDashboard(true);
+          } catch (error) {
+            console.error('Error parsing stored user:', error);
+            localStorage.removeItem('currentUser');
+          }
+        }
+      }
+    };
+
+    // Check for OAuth success parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('auth') === 'success') {
+      // Remove the parameter from URL
+      window.history.replaceState({}, document.title, '/');
+      checkAuthStatus();
+    } else {
+      checkAuthStatus();
+    }
+  }, []);
 
   // Function to handle blog navigation and scroll to top
   const handleBlogClick = () => {

@@ -36,6 +36,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Setup Google OAuth
   setupGoogleAuth(app);
+  // Check authentication status
+  app.get("/api/auth/check", (req, res) => {
+    if (req.isAuthenticated()) {
+      res.json({ authenticated: true, user: req.user });
+    } else {
+      res.json({ authenticated: false });
+    }
+  });
+
+  // Logout route
+  app.get("/api/auth/logout", (req, res) => {
+    req.logout(() => {
+      res.redirect('/');
+    });
+  });
+
   // Authentication routes
   app.post("/api/auth/register", async (req, res) => {
     try {

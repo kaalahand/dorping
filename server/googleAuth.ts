@@ -59,7 +59,7 @@ export function setupGoogleAuth(app: Express) {
     passport.authenticate('google', { failureRedirect: '/' }),
     (req, res) => {
       // Successful authentication, redirect to dashboard
-      res.redirect('/');
+      res.redirect('/?auth=success');
     }
   );
 }
