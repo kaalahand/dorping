@@ -1,0 +1,42 @@
+Core Purpose
+Dorp AI is an AI-powered prompt engineering platform that transforms simple user ideas into polished, professional content. The name "Dorping" refers to the act of using intelligent, structured prompts (called "Dorps") to get better AI outputs.
+
+Key Features & Functionality
+1. Intelligent Prompt Engineering
+Users don't need to craft complex prompts themselves
+The AI asks targeted follow-up questions to understand context, audience, and goals
+Generates platform-specific prompts optimized for different AI tools (ChatGPT, Midjourney, etc.)
+2. Content Creation Studio
+The platform offers 8 main content types:
+
+Write Email - Professional communications and follow-ups
+Create Document - Reports, proposals, structured documents
+Creative Ideas - Brainstorming and ideation
+Entertainment - Fun content and jokes
+Write Code - Programming and technical documentation
+Content Creation - Blog posts, social media content
+Team Communication - Meeting notes, updates
+Business Strategy - Plans and business documents
+3. Three-Step Process
+Select Task - Choose what type of content to create
+Answer Questions - AI asks about goal, audience, and tone
+Get Output - Receive polished, ready-to-use content
+4. Subscription Model
+Free: 50 prompts/month
+Starter: 125 prompts for $4.99/month
+Pro: 500 prompts for $19.99/month
+Unlimited: Unlimited prompts for $49/month
+5. Value Proposition
+Saves 8.1 hours weekly for content creators
+78% first-try success rate vs generic prompts
+67% faster results compared to manual prompt crafting
+Eliminates the frustration of prompt iteration
+Target Market
+Marketing managers creating campaigns
+Students writing academic papers
+Project managers handling team communications
+Content creators and professionals who regularly use AI tools
+Unique Selling Point
+Instead of users struggling with generic AI prompts, Dorp AI acts as an intelligent intermediary that understands user intent and generates optimized, platform-specific prompts that deliver better results on the first try.
+
+The application essentially democratizes prompt engineering expertise, making advanced AI interaction accessible to non-technical users while saving significant time and improving output quality.

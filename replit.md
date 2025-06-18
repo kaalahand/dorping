@@ -101,9 +101,21 @@ Dorp AI is a full-stack web application that provides AI-powered prompt engineer
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+✓ Successfully migrated from Bolt to Replit environment (June 18, 2025)
+✓ All dependencies verified and working
+✓ Frontend React application with comprehensive UI components
+✓ Backend Express server with proper routing structure
+✓ Authentication system with modals and user management
+✓ Dashboard with 8 content creation categories matching business requirements
+✓ Subscription tiers implemented (Free, Starter, Pro, Unlimited)
+✓ SEO optimization with dynamic meta tags and structured data
+
 ## Changelog
 
 ```
 Changelog:
+- June 18, 2025. Migrated from Bolt to Replit, verified all functionality
 - June 16, 2025. Initial setup
 ```
