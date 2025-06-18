@@ -50,6 +50,14 @@ import {
 
 interface DashboardProps {
   onLogout: () => void;
+  user?: {
+    id: number;
+    username: string;
+    email: string;
+    plan: string;
+    promptsUsed: number;
+    promptsLimit: number;
+  };
 }
 
 interface SavedPrompt {
@@ -70,7 +78,7 @@ interface SavedPrompt {
   isFavorite: boolean;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
+const Dashboard: React.FC<DashboardProps> = ({ onLogout, user }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedTask, setSelectedTask] = useState<string | null>(null);
   const [userPrompt, setUserPrompt] = useState('');
@@ -187,9 +195,25 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     { id: '90d', label: 'Last 90 Days' }
   ];
 
-  // Initialize with sample data
+  // Close dropdown when clicking outside
   useEffect(() => {
-    const samplePrompts: SavedPrompt[] = [
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowProfileDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Initialize with sample data (only for demo user)
+  useEffect(() => {
+    // Only show sample data for the demo user
+    if (user?.email === 'jondoe@test.com') {
+      const samplePrompts: SavedPrompt[] = [
       {
         id: '1',
         name: 'Write-Email-follow-up-meeting-Jan-15-2025',
@@ -273,7 +297,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       }
     ];
     setSavedPrompts(samplePrompts);
-  }, []);
+    } else {
+      // For new users, start with empty prompts
+      setSavedPrompts([]);
+    }
+  }, [user]);
 
   // Filter and search prompts
   const filteredPrompts = savedPrompts.filter(prompt => {
@@ -840,33 +868,80 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
             <div className="bg-gray-50 rounded-lg p-3">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">Prompts Used</span>
-                <span className="text-sm text-gray-500">12/50</span>
+                <span className="text-sm text-gray-500">{user?.promptsUsed || 0}/{user?.promptsLimit || 50}</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" style={{ width: '24%' }}></div>
+                <div 
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" 
+                  style={{ width: `${((user?.promptsUsed || 0) / (user?.promptsLimit || 50)) * 100}%` }}
+                ></div>
               </div>
-              <p className="text-xs text-gray-500 mt-1">38 prompts remaining this month</p>
+              <p className="text-xs text-gray-500 mt-1">
+                {(user?.promptsLimit || 50) - (user?.promptsUsed || 0)} prompts remaining this month
+              </p>
             </div>
           )}
 
           {/* User Profile */}
-          <div className={`flex items-center ${sidebarCollapsed ? 'flex-col space-y-2' : 'space-x-3'}`}>
-            <div className={`${sidebarCollapsed ? 'w-10 h-10' : 'w-8 h-8'} bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0`}>
-              <User className={`${sidebarCollapsed ? 'w-5 h-5' : 'w-4 h-4'} text-white`} />
-            </div>
-            {!sidebarCollapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">John Doe</p>
-                <p className="text-xs text-gray-500">Free Plan</p>
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+              className={`w-full flex items-center ${sidebarCollapsed ? 'flex-col space-y-2 justify-center' : 'space-x-3'} p-2 hover:bg-gray-50 rounded-lg transition-colors`}
+            >
+              <div className={`${sidebarCollapsed ? 'w-10 h-10' : 'w-8 h-8'} bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0`}>
+                <User className={`${sidebarCollapsed ? 'w-5 h-5' : 'w-4 h-4'} text-white`} />
+              </div>
+              {!sidebarCollapsed && (
+                <>
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {user?.username || 'Jon Doe'}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {user?.email || 'jondoe@test.com'}
+                    </p>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showProfileDropdown ? 'rotate-180' : ''}`} />
+                </>
+              )}
+            </button>
+
+            {/* Profile Dropdown */}
+            {showProfileDropdown && (
+              <div className={`absolute ${sidebarCollapsed ? 'left-full ml-2 bottom-0' : 'top-full mt-2'} w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50`}>
+                <button
+                  onClick={() => {
+                    setShowProfileDropdown(false);
+                    // Handle profile action
+                  }}
+                  className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <User className="w-4 h-4" />
+                  <span>Profile</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setShowProfileDropdown(false);
+                    // Handle subscription action
+                  }}
+                  className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <CreditCard className="w-4 h-4" />
+                  <span>Subscription</span>
+                </button>
+                <hr className="my-2 border-gray-200" />
+                <button
+                  onClick={() => {
+                    setShowProfileDropdown(false);
+                    onLogout();
+                  }}
+                  className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign Out</span>
+                </button>
               </div>
             )}
-            <button
-              onClick={onLogout}
-              className={`p-2 text-gray-400 hover:text-gray-600 transition-colors ${sidebarCollapsed ? 'w-full flex justify-center' : ''}`}
-              title="Logout"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
           </div>
         </div>
       </div>
