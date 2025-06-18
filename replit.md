@@ -111,6 +111,10 @@ Preferred communication style: Simple, everyday language.
 ✓ Dashboard with 8 content creation categories matching business requirements
 ✓ Subscription tiers implemented (Free, Starter, Pro, Unlimited)
 ✓ SEO optimization with dynamic meta tags and structured data
+✓ Profile dropdown with Profile, Subscription, and Sign Out options (June 18, 2025)
+✓ Dynamic user data integration showing real database information
+✓ Demo user account created: jondoe@test.com / demo123
+✓ New users see personalized dashboard with correct prompt limits
 
 ## Changelog
 
