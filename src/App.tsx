@@ -14,7 +14,11 @@ import {
   Clock,
   Smile,
   Menu,
-  X
+  X,
+  Code,
+  PenTool,
+  MessageSquare,
+  Briefcase
 } from 'lucide-react';
 import SignupModal from './components/SignupModal';
 import SignInModal from './components/SignInModal';
@@ -226,6 +230,66 @@ function App() {
       value: "$6.5B",
       label: "Market Size",
       description: "Uses actual market size projections to show industry momentum"
+    }
+  ];
+
+  // Task options for the homepage
+  const homepageTasks = [
+    {
+      id: 'email',
+      title: 'Write Email',
+      icon: <Mail className="w-6 h-6" />,
+      color: 'from-blue-500 to-blue-600',
+      description: 'Professional emails, follow-ups, and communications'
+    },
+    {
+      id: 'document',
+      title: 'Create Document',
+      icon: <FileText className="w-6 h-6" />,
+      color: 'from-purple-500 to-purple-600',
+      description: 'Reports, proposals, and structured documents'
+    },
+    {
+      id: 'creative',
+      title: 'Creative Ideas',
+      icon: <Lightbulb className="w-6 h-6" />,
+      color: 'from-green-500 to-green-600',
+      description: 'Brainstorming, creative writing, and ideation'
+    },
+    {
+      id: 'entertainment',
+      title: 'Entertain Me',
+      icon: <Smile className="w-6 h-6" />,
+      color: 'from-orange-500 to-orange-600',
+      description: 'Fun content, jokes, and entertainment'
+    },
+    {
+      id: 'code',
+      title: 'Write Code',
+      icon: <Code className="w-6 h-6" />,
+      color: 'from-indigo-500 to-indigo-600',
+      description: 'Programming, scripts, and technical documentation'
+    },
+    {
+      id: 'content',
+      title: 'Content Creation',
+      icon: <PenTool className="w-6 h-6" />,
+      color: 'from-pink-500 to-pink-600',
+      description: 'Blog posts, social media, and marketing content'
+    },
+    {
+      id: 'communication',
+      title: 'Team Communication',
+      icon: <MessageSquare className="w-6 h-6" />,
+      color: 'from-teal-500 to-teal-600',
+      description: 'Meeting notes, updates, and team messages'
+    },
+    {
+      id: 'business',
+      title: 'Business Strategy',
+      icon: <Briefcase className="w-6 h-6" />,
+      color: 'from-red-500 to-red-600',
+      description: 'Plans, strategies, and business documents'
     }
   ];
 
@@ -565,15 +629,19 @@ function App() {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">Choose Your Task</h3>
                 <p className="text-gray-600 mb-6">Select from our library of templates: emails, documents, content, and more.</p>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
-                    <Mail className="w-5 h-5 text-blue-600 mx-auto mb-1" />
-                    <span className="text-xs font-medium text-blue-700">Email</span>
-                  </div>
-                  <div className="bg-purple-50 border border-purple-200 p-3 rounded-lg">
-                    <FileText className="w-5 h-5 text-purple-600 mx-auto mb-1" />
-                    <span className="text-xs font-medium text-purple-700">Content</span>
-                  </div>
+                
+                {/* Task Grid - All 8 tasks */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {homepageTasks.map((task) => (
+                    <div key={task.id} className={`bg-gradient-to-r ${task.color} text-white p-3 rounded-lg group-hover:scale-105 transition-all`}>
+                      <div className="flex flex-col items-center text-center">
+                        <div className="mb-2">
+                          {task.icon}
+                        </div>
+                        <span className="text-xs font-medium">{task.title}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
