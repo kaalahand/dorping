@@ -86,7 +86,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToSi
 
       if (response.ok) {
         console.log('Signup successful:', data);
-        onSuccess();
+        onSuccess(data.user);
       } else {
         console.error('Signup failed:', data.message);
         setError(data.message || 'Signup failed');
