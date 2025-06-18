@@ -49,14 +49,15 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .insert(users)
       .values({
+        username: userData.username,
+        password: '', // Empty password for Google OAuth users
         email: userData.email,
-        googleId: userData.googleId,
         plan: userData.plan,
         promptsUsed: 0,
         promptsLimit: promptsLimit,
+        googleId: userData.googleId,
         authProvider: 'google',
-        isEmailVerified: 1,
-        createdAt: new Date()
+        isEmailVerified: 1
       })
       .returning();
     return user;

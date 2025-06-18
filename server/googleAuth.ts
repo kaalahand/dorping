@@ -46,7 +46,7 @@ export function setupGoogleAuth(app: Express) {
       return done(null, newUser);
     } catch (error) {
       console.error('Google OAuth error:', error);
-      return done(error, null);
+      return done(error, false);
     }
   }));
 

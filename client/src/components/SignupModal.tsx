@@ -100,10 +100,12 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToSi
   };
 
   const handleGoogleSignup = () => {
-    // Here you would integrate with Google OAuth
-    console.log('Google signup for plan:', currentPlan);
-    // For demo purposes, redirect to dashboard
-    onSuccess();
+    // Store selected plan in sessionStorage for after OAuth redirect
+    if (currentPlan) {
+      sessionStorage.setItem('selectedPlan', JSON.stringify(currentPlan));
+    }
+    // Redirect to Google OAuth endpoint
+    window.location.href = '/auth/google';
   };
 
   const handlePlanSelect = (plan: typeof plans[0]) => {

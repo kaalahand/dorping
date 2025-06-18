@@ -8,6 +8,34 @@ import { z } from "zod";
 import { setupGoogleAuth } from "./googleAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Session configuration for Passport
+  app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-session-secret-here',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false } // Set to true in production with HTTPS
+  }));
+
+  // Initialize Passport
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  // Passport session serialization
+  passport.serializeUser((user: any, done) => {
+    done(null, user.id);
+  });
+
+  passport.deserializeUser(async (id: number, done) => {
+    try {
+      const user = await storage.getUser(id);
+      done(null, user);
+    } catch (error) {
+      done(error, null);
+    }
+  });
+
+  // Setup Google OAuth
+  setupGoogleAuth(app);
   // Authentication routes
   app.post("/api/auth/register", async (req, res) => {
     try {

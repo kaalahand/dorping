@@ -55,10 +55,8 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSwitchToSi
   };
 
   const handleGoogleSignIn = () => {
-    // Here you would integrate with Google OAuth
-    console.log('Google sign in');
-    // For demo purposes, redirect to dashboard
-    onSuccess();
+    // Redirect to Google OAuth endpoint
+    window.location.href = '/auth/google';
   };
 
   const handleForgotPassword = () => {
