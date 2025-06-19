@@ -109,21 +109,22 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToSi
     // Use window.open to bypass iframe restrictions
     const authWindow = window.open('/auth/google', '_blank', 'width=500,height=600');
     
-    // Listen for the auth completion
-    const checkAuth = setInterval(async () => {
-      try {
-        if (authWindow?.closed) {
-          clearInterval(checkAuth);
-          // Check if user is now authenticated
-          const response = await fetch('/api/auth/check');
-          const data = await response.json();
-          if (data.authenticated) {
-            onSuccess(data.user);
-            window.location.reload();
-          }
-        }
-      } catch (error) {
-        console.error('Auth check error:', error);
+    // Listen for authentication success message
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === 'AUTH_SUCCESS') {
+        window.removeEventListener('message', handleMessage);
+        onSuccess(event.data.user);
+        window.location.reload();
+      }
+    };
+    
+    window.addEventListener('message', handleMessage);
+    
+    // Fallback: check when popup closes
+    const checkClosed = setInterval(() => {
+      if (authWindow?.closed) {
+        clearInterval(checkClosed);
+        window.removeEventListener('message', handleMessage);
       }
     }, 1000);
   };

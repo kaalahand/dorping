@@ -64,9 +64,13 @@ export function setupGoogleAuth(app: Express) {
   app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/' }),
     (req, res) => {
-      // Successful authentication, close popup window
+      // For popup authentication, we need to communicate with the parent window
       res.send(`
         <script>
+          // Notify parent window and close popup
+          if (window.opener) {
+            window.opener.postMessage({ type: 'AUTH_SUCCESS', user: ${JSON.stringify(req.user)} }, '*');
+          }
           window.close();
         </script>
         <p>Authentication successful! You can close this window.</p>
