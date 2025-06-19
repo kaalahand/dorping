@@ -65,27 +65,11 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSwitchToSi
       if (event.data.type === 'AUTH_SUCCESS') {
         window.removeEventListener('message', handleMessage);
         
-        // Manually authenticate the user in the main window session
-        try {
-          const response = await fetch('/api/auth/google-login', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId: event.data.user.id }),
-          });
-          
-          const data = await response.json();
-          if (data.authenticated) {
-            onSuccess(data.user);
-            window.location.reload();
-          }
-        } catch (error) {
-          console.error('Manual authentication error:', error);
-          // Fallback to direct user data
-          onSuccess(event.data.user);
-          window.location.reload();
-        }
+        // Store user data directly in localStorage to bypass session issues
+        const userData = event.data.user;
+        localStorage.setItem('currentUser', JSON.stringify(userData));
+        onSuccess(userData);
+        window.location.reload();
       }
     };
     

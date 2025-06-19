@@ -12,11 +12,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(session({
     secret: process.env.SESSION_SECRET || 'your-session-secret-here',
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true, // Changed to true for OAuth
     cookie: { 
-      secure: true, // Use HTTPS in production
+      secure: false, // Set to false for development
       sameSite: 'lax',
-      httpOnly: true
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
   }));
 
