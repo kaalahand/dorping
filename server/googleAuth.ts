@@ -36,12 +36,13 @@ export function setupGoogleAuth(app: Express) {
         }
       }
       
-      // Create new user
+      // Create new user with selected plan from signup
+      // Default to Free plan, but this will be updated from frontend
       const newUser = await storage.createGoogleUser({
         googleId: profile.id,
         email: email || '',
         username: profile.displayName || email || `user_${profile.id}`,
-        plan: 'Free'
+        plan: 'Free' // Will be updated after creation
       });
       
       console.log('Created new user:', newUser);

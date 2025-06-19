@@ -10,6 +10,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   createGoogleUser(userData: { googleId: string; email: string; username: string; plan: string }): Promise<User>;
   linkGoogleAccount(userId: number, googleId: string): Promise<void>;
+  updateUserPlan(userId: number, plan: string, promptsLimit: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -67,6 +68,16 @@ export class DatabaseStorage implements IStorage {
     await db
       .update(users)
       .set({ googleId: googleId })
+      .where(eq(users.id, userId));
+  }
+
+  async updateUserPlan(userId: number, plan: string, promptsLimit: number): Promise<void> {
+    await db
+      .update(users)
+      .set({ 
+        plan: plan,
+        promptsLimit: promptsLimit
+      })
       .where(eq(users.id, userId));
   }
 }

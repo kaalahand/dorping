@@ -75,22 +75,22 @@ function App() {
   };
 
   const handleSignupClick = (plan?: typeof plans[0]) => {
-    if (plan) {
-      setSelectedPlan({
-        name: plan.name,
-        price: plan.price,
-        period: plan.period,
-        prompts: plan.prompts
-      });
-    } else {
+    const planToSet = plan ? {
+      name: plan.name,
+      price: plan.price,
+      period: plan.period,
+      prompts: plan.prompts
+    } : {
       // Default to Free plan for general signup buttons
-      setSelectedPlan({
-        name: 'Free',
-        price: '$0',
-        period: '',
-        prompts: '50 prompts'
-      });
-    }
+      name: 'Free',
+      price: '$0',
+      period: '',
+      prompts: '50 prompts'
+    };
+    
+    setSelectedPlan(planToSet);
+    // Store selected plan in sessionStorage for Google OAuth
+    sessionStorage.setItem('selectedPlan', JSON.stringify(planToSet));
     setIsSignupModalOpen(true);
     setIsMobileMenuOpen(false);
   };

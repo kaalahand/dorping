@@ -114,10 +114,43 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToSi
       if (event.data.type === 'AUTH_SUCCESS') {
         window.removeEventListener('message', handleMessage);
         
-        // Store user data directly in localStorage to bypass session issues
+        // Handle selected plan from sessionStorage
         const userData = event.data.user;
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        onSuccess(userData);
+        const selectedPlan = sessionStorage.getItem('selectedPlan');
+        
+        if (selectedPlan) {
+          try {
+            const planData = JSON.parse(selectedPlan);
+            // Update user's subscription plan
+            const response = await fetch(`/api/users/${userData.id}/update-plan`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ plan: planData.name }),
+            });
+            
+            if (response.ok) {
+              const result = await response.json();
+              localStorage.setItem('currentUser', JSON.stringify(result.user));
+              sessionStorage.removeItem('selectedPlan'); // Clean up
+              onSuccess(result.user);
+            } else {
+              // Fallback to original user data
+              localStorage.setItem('currentUser', JSON.stringify(userData));
+              onSuccess(userData);
+            }
+          } catch (error) {
+            console.error('Plan update error:', error);
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+            onSuccess(userData);
+          }
+        } else {
+          // No plan selected, use default
+          localStorage.setItem('currentUser', JSON.stringify(userData));
+          onSuccess(userData);
+        }
+        
         window.location.reload();
       }
     };

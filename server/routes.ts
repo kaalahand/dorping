@@ -58,6 +58,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user subscription plan
+  app.post("/api/users/:id/update-plan", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { plan } = req.body;
+      
+      // Calculate prompt limits based on plan
+      const promptLimits = {
+        'Free': 50,
+        'Starter': 125,
+        'Pro': 500,
+        'Unlimited': 99999 // Large number for unlimited
+      };
+      
+      const promptsLimit = promptLimits[plan as keyof typeof promptLimits] || 50;
+      
+      // Update user in database
+      await storage.updateUserPlan(parseInt(id), plan, promptsLimit);
+      
+      // Get updated user
+      const updatedUser = await storage.getUser(parseInt(id));
+      
+      res.json({ success: true, user: updatedUser });
+    } catch (error) {
+      console.error('Update plan error:', error);
+      res.status(500).json({ error: 'Failed to update plan' });
+    }
+  });
+
   // Manual authentication endpoint for Google OAuth users
   app.post("/api/auth/google-login", async (req, res) => {
     try {
