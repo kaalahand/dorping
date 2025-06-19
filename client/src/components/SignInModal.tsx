@@ -55,8 +55,10 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSwitchToSi
   };
 
   const handleGoogleSignIn = () => {
-    // Redirect to Google OAuth endpoint
-    window.location.href = '/auth/google';
+    // Close modal first to avoid iframe issues
+    onClose();
+    // Redirect to Google OAuth endpoint in main window
+    window.top!.location.href = '/auth/google';
   };
 
   const handleForgotPassword = () => {

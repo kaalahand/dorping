@@ -13,7 +13,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     secret: process.env.SESSION_SECRET || 'your-session-secret-here',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // Set to true in production with HTTPS
+    cookie: { 
+      secure: true, // Use HTTPS in production
+      sameSite: 'lax',
+      httpOnly: true
+    }
   }));
 
   // Initialize Passport

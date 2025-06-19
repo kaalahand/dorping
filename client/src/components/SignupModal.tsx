@@ -104,8 +104,10 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToSi
     if (currentPlan) {
       sessionStorage.setItem('selectedPlan', JSON.stringify(currentPlan));
     }
-    // Redirect to Google OAuth endpoint
-    window.location.href = '/auth/google';
+    // Close modal first to avoid iframe issues
+    onClose();
+    // Redirect to Google OAuth endpoint in main window
+    window.top!.location.href = '/auth/google';
   };
 
   const handlePlanSelect = (plan: typeof plans[0]) => {
