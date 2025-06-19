@@ -3,7 +3,7 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import type { Express } from 'express';
 import { storage } from './storage';
 
-const GOOGLE_CLIENT_ID = '611093594672-9ah1rug8k9q6jp9nr7bru1mfaj1o0t3j.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '611093594672-9ah1rug8k9q6jp9nr7bru1mfaj1o0t3j.apps.googleusercontent.com';
 
 export function setupGoogleAuth(app: Express) {
   // Google OAuth Strategy
@@ -51,9 +51,13 @@ export function setupGoogleAuth(app: Express) {
   }));
 
   // Google OAuth routes
-  app.get('/auth/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] })
-  );
+  app.get('/auth/google', (req, res, next) => {
+    console.log('Google OAuth request initiated');
+    console.log('Client ID:', process.env.GOOGLE_CLIENT_ID ? 'Set' : 'Not set');
+    console.log('Client Secret:', process.env.GOOGLE_CLIENT_SECRET ? 'Set' : 'Not set');
+    console.log('Callback URL:', `https://${process.env.REPLIT_DOMAINS}/auth/google/callback`);
+    passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+  });
 
   app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/' }),
