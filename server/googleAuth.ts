@@ -44,6 +44,7 @@ export function setupGoogleAuth(app: Express) {
         plan: 'Free'
       });
       
+      console.log('Created new user:', newUser);
       return done(null, newUser);
     } catch (error) {
       console.error('Google OAuth error:', error);

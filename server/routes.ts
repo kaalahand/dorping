@@ -26,14 +26,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Passport session serialization
   passport.serializeUser((user: any, done) => {
+    console.log('Serializing user:', user);
     done(null, user.id);
   });
 
   passport.deserializeUser(async (id: number, done) => {
     try {
+      console.log('Deserializing user ID:', id);
       const user = await storage.getUser(id);
+      console.log('Deserialized user:', user);
       done(null, user);
     } catch (error) {
+      console.error('Deserialize error:', error);
       done(error, null);
     }
   });
@@ -42,6 +46,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   setupGoogleAuth(app);
   // Check authentication status
   app.get("/api/auth/check", (req, res) => {
+    console.log('Auth check - Session ID:', req.sessionID);
+    console.log('Auth check - Is authenticated:', req.isAuthenticated());
+    console.log('Auth check - User:', req.user);
+    console.log('Auth check - Session:', req.session);
+    
     if (req.isAuthenticated()) {
       res.json({ authenticated: true, user: req.user });
     } else {
