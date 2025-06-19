@@ -121,61 +121,71 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, user }) => {
   });
 
   const tasks = [
+    // Active tasks (first 4)
     {
       id: 'email',
       title: 'Write Email',
       icon: <Mail className="w-6 h-6" />,
       color: 'from-blue-500 to-blue-600',
-      description: 'Professional emails, follow-ups, and communications'
+      description: 'Professional emails, follow-ups, and communications',
+      active: true
     },
     {
-      id: 'content',
-      title: 'Create Content',
+      id: 'report',
+      title: 'Create Report',
       icon: <FileText className="w-6 h-6" />,
       color: 'from-purple-500 to-purple-600',
-      description: 'Reports, proposals, and structured documents'
-    },
-    {
-      id: 'master-prompts',
-      title: 'Create Master Prompts',
-      icon: <Lightbulb className="w-6 h-6" />,
-      color: 'from-green-500 to-green-600',
-      description: 'Brainstorming, creative writing, and ideation'
-    },
-    {
-      id: 'entertainment',
-      title: 'Entertain Me',
-      icon: <Smile className="w-6 h-6" />,
-      color: 'from-orange-500 to-orange-600',
-      description: 'Fun content, jokes, and entertainment'
-    },
-    {
-      id: 'code',
-      title: 'Write Code',
-      icon: <Code className="w-6 h-6" />,
-      color: 'from-indigo-500 to-indigo-600',
-      description: 'Programming, scripts, and technical documentation'
+      description: 'Reports, proposals, and structured documents',
+      active: true
     },
     {
       id: 'content-creation',
       title: 'Content Creation',
       icon: <PenTool className="w-6 h-6" />,
       color: 'from-pink-500 to-pink-600',
-      description: 'Blog posts, social media, and marketing content'
+      description: 'Blog posts, social media, and marketing content',
+      active: true
     },
     {
       id: 'communication',
       title: 'Team Communication',
       icon: <MessageSquare className="w-6 h-6" />,
       color: 'from-teal-500 to-teal-600',
-      description: 'Meeting notes, updates, and team messages'
+      description: 'Meeting notes, updates, and team messages',
+      active: true
+    },
+    // Coming soon tasks (inactive)
+    {
+      id: 'master-prompts',
+      title: 'Create Master Prompts',
+      icon: <Lightbulb className="w-6 h-6" />,
+      color: 'from-green-500 to-green-600',
+      description: 'Brainstorming, creative writing, and ideation',
+      active: false
+    },
+    {
+      id: 'entertainment',
+      title: 'Entertain Me',
+      icon: <Smile className="w-6 h-6" />,
+      color: 'from-orange-500 to-orange-600',
+      description: 'Fun content, jokes, and entertainment',
+      active: false
+    },
+    {
+      id: 'code',
+      title: 'Write Code',
+      icon: <Code className="w-6 h-6" />,
+      color: 'from-indigo-500 to-indigo-600',
+      description: 'Programming, scripts, and technical documentation',
+      active: false
     },
     {
       id: 'business',
       title: 'Business Strategy',
       icon: <Briefcase className="w-6 h-6" />,
       color: 'from-red-500 to-red-600',
-      description: 'Plans, strategies, and business documents'
+      description: 'Plans, strategies, and business documents',
+      active: false
     }
   ];
 
@@ -358,8 +368,12 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, user }) => {
   });
 
   const handleTaskSelect = (taskId: string) => {
-    setSelectedTask(taskId);
-    setCurrentStep(2);
+    // Only allow selection of active tasks
+    const task = tasks.find(t => t.id === taskId);
+    if (task && task.active) {
+      setSelectedTask(taskId);
+      setCurrentStep(2);
+    }
   };
 
   const handleGenerateOutput = async () => {
@@ -410,33 +424,102 @@ Would you be available for a brief call this week to discuss the details? I'm co
 Best regards,
 [Your Name]`;
         break;
-      case 'content':
-        sampleOutput = `# ${answers.goal || 'Project Proposal'}
+      case 'report':
+        sampleOutput = `# ${answers.goal || 'Project Report'}
 
 ## Executive Summary
 
-This document outlines a comprehensive approach to ${answers.goal || 'achieving our strategic objectives'} while maintaining a ${answers.tone || 'professional'} standard that resonates with our ${answers.audience || 'stakeholders'}.
+This report outlines a comprehensive analysis of ${answers.goal || 'our strategic objectives'} while maintaining a ${answers.tone || 'professional'} standard that resonates with our ${answers.audience || 'stakeholders'}.
 
 ## Objectives
 
 - Primary Goal: ${answers.goal || 'Deliver exceptional results'}
 - Target Audience: ${answers.audience || 'Key stakeholders and team members'}
-- Approach: ${answers.tone || 'Collaborative and results-driven'}
+- Approach: ${answers.tone || 'Analytical and data-driven'}
 
 ## Key Components
 
 ### 1. Strategic Framework
-Our approach focuses on delivering measurable outcomes that align with organizational priorities.
+Our analysis focuses on delivering measurable insights that align with organizational priorities.
 
 ### 2. Implementation Plan
-A phased approach ensuring smooth execution and continuous improvement.
+A phased approach ensuring thorough evaluation and continuous improvement.
 
 ### 3. Success Metrics
 Clear KPIs to track progress and ensure accountability.
 
 ## Conclusion
 
-This proposal represents a strategic opportunity to ${answers.goal || 'drive meaningful change'} while maintaining the highest standards of quality and professionalism.`;
+This report represents a strategic analysis of ${answers.goal || 'current initiatives'} while maintaining the highest standards of quality and professionalism.`;
+        break;
+      case 'content-creation':
+        sampleOutput = `# ${answers.goal || 'Engaging Content'}
+
+## Content Overview
+
+This content is designed to ${answers.goal || 'engage and inform your audience'} while maintaining a ${answers.tone || 'compelling'} voice that resonates with ${answers.audience || 'your target readers'}.
+
+## Key Messages
+
+- **Primary Focus**: ${answers.goal || 'Delivering value to your audience'}
+- **Target Audience**: ${answers.audience || 'Engaged readers and potential customers'}
+- **Content Tone**: ${answers.tone || 'Engaging and authentic'}
+
+## Content Strategy
+
+### 1. Hook and Introduction
+Capture attention immediately with a compelling opening that addresses your audience's needs.
+
+### 2. Value Delivery
+Provide actionable insights and information that your ${answers.audience || 'audience'} can immediately apply.
+
+### 3. Call to Action
+Guide readers toward the next step with clear, compelling action items.
+
+## Content Body
+
+${userPrompt}
+
+This content has been crafted to achieve your goal of ${answers.goal || 'meaningful engagement'} while speaking directly to your ${answers.audience || 'target audience'} in a ${answers.tone || 'authentic'} voice.
+
+## Performance Optimization
+
+- SEO-optimized structure and headings
+- Engaging headlines and subheadings  
+- Clear call-to-action elements
+- Social media ready formatting`;
+        break;
+      case 'communication':
+        sampleOutput = `# Team Communication: ${answers.goal || 'Project Update'}
+
+## Communication Overview
+
+**Purpose**: ${answers.goal || 'Keep the team aligned and informed'}
+**Audience**: ${answers.audience || 'Team members and stakeholders'}
+**Tone**: ${answers.tone || 'Professional and collaborative'}
+
+## Key Points
+
+### Current Status
+Our team has been working on ${userPrompt} with the following progress and updates.
+
+### Action Items
+- **Immediate Actions**: Steps that need attention this week
+- **Upcoming Milestones**: Key deliverables and deadlines
+- **Team Responsibilities**: Clear ownership and accountability
+
+### Next Steps
+1. **Review and Feedback**: ${answers.audience || 'Team members'} to provide input by [date]
+2. **Implementation**: Execute planned activities with ${answers.tone || 'collaborative'} approach
+3. **Follow-up**: Schedule next check-in to maintain momentum
+
+## Communication Details
+
+${answers.goal || 'Our primary objective'} is to ensure everyone stays informed and aligned on project progress. This update maintains a ${answers.tone || 'professional yet approachable'} tone to facilitate open communication among ${answers.audience || 'all team members'}.
+
+## Questions and Support
+
+Please reach out with any questions or if you need additional clarification on any points discussed above.`;
         break;
       default:
         sampleOutput = `# ${taskInfo?.title || 'Generated Content'}
@@ -1213,19 +1296,34 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
                         
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           {tasks.map((task) => (
-                            <button
-                              key={task.id}
-                              onClick={() => handleTaskSelect(task.id)}
-                              className={`bg-gradient-to-r ${task.color} text-white p-6 rounded-xl hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl group`}
-                            >
-                              <div className="flex flex-col items-center text-center">
-                                <div className="mb-3 group-hover:scale-110 transition-transform">
-                                  {task.icon}
+                            <div key={task.id} className="relative group">
+                              <button
+                                onClick={() => task.active ? handleTaskSelect(task.id) : null}
+                                className={`w-full p-6 rounded-xl transition-all duration-300 shadow-lg ${
+                                  task.active 
+                                    ? `bg-gradient-to-r ${task.color} text-white hover:scale-105 hover:shadow-xl cursor-pointer`
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                }`}
+                                disabled={!task.active}
+                              >
+                                <div className="flex flex-col items-center text-center">
+                                  <div className={`mb-3 transition-transform ${task.active ? 'group-hover:scale-110' : ''}`}>
+                                    {task.icon}
+                                  </div>
+                                  <h3 className="font-semibold mb-2">{task.title}</h3>
+                                  <p className="text-xs opacity-90">{task.description}</p>
                                 </div>
-                                <h3 className="font-semibold mb-2">{task.title}</h3>
-                                <p className="text-xs opacity-90">{task.description}</p>
-                              </div>
-                            </button>
+                              </button>
+                              
+                              {/* Coming Soon Tooltip for inactive tasks */}
+                              {!task.active && (
+                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black bg-opacity-75 rounded-xl pointer-events-none">
+                                  <div className="text-white text-sm font-medium px-3 py-1 bg-black rounded-lg">
+                                    Coming Soon
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           ))}
                         </div>
                       </div>

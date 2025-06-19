@@ -117,6 +117,9 @@ Preferred communication style: Simple, everyday language.
 ✓ New users see personalized dashboard with correct prompt limits
 ✓ Google OAuth integration completed with proper HTTPS and session handling (June 18, 2025)
 ✓ Fixed Google authentication iframe issues and redirect URI configuration
+✓ Task tiles reorganized with first 4 active and remaining 4 with "coming soon" functionality (June 19, 2025)
+✓ Renamed "Create Content" to "Create Report" and reordered tasks as requested
+✓ Sidebar expand button repositioned to appear as integrated part of collapsed sidebar
 
 ## Changelog
 
