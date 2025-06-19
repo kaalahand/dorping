@@ -868,16 +868,27 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
             <div className="bg-gray-50 rounded-lg p-3">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">Prompts Used</span>
-                <span className="text-sm text-gray-500">{user?.promptsUsed || 0}/{user?.promptsLimit || 50}</span>
+                <span className="text-sm text-gray-500">
+                  {user?.promptsUsed || 0}/{user?.plan === 'Unlimited' ? 'Unlimited' : user?.promptsLimit || 50}
+                </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" 
-                  style={{ width: `${((user?.promptsUsed || 0) / (user?.promptsLimit || 50)) * 100}%` }}
-                ></div>
-              </div>
+              {user?.plan === 'Unlimited' ? (
+                <div className="w-full bg-gradient-to-r from-green-500 to-blue-500 rounded-full h-2">
+                  <div className="w-full h-2 rounded-full bg-gradient-to-r from-green-500 to-blue-500"></div>
+                </div>
+              ) : (
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" 
+                    style={{ width: `${((user?.promptsUsed || 0) / (user?.promptsLimit || 50)) * 100}%` }}
+                  ></div>
+                </div>
+              )}
               <p className="text-xs text-gray-500 mt-1">
-                {(user?.promptsLimit || 50) - (user?.promptsUsed || 0)} prompts remaining this month
+                {user?.plan === 'Unlimited' 
+                  ? 'Unlimited prompts available' 
+                  : `${(user?.promptsLimit || 50) - (user?.promptsUsed || 0)} prompts remaining this month`
+                }
               </p>
             </div>
           )}
