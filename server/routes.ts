@@ -49,12 +49,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log('Auth check - Session ID:', req.sessionID);
     console.log('Auth check - Is authenticated:', req.isAuthenticated());
     console.log('Auth check - User:', req.user);
-    console.log('Auth check - Session:', req.session);
     
     if (req.isAuthenticated()) {
       res.json({ authenticated: true, user: req.user });
     } else {
       res.json({ authenticated: false });
+    }
+  });
+
+  // Manual authentication endpoint for Google OAuth users
+  app.post("/api/auth/google-login", async (req, res) => {
+    try {
+      const { userId } = req.body;
+      const user = await storage.getUser(userId);
+      
+      if (user) {
+        // Manually log in the user
+        req.login(user, (err) => {
+          if (err) {
+            console.error('Manual login error:', err);
+            return res.status(500).json({ error: 'Login failed' });
+          }
+          res.json({ authenticated: true, user });
+        });
+      } else {
+        res.status(404).json({ error: 'User not found' });
+      }
+    } catch (error) {
+      console.error('Google login error:', error);
+      res.status(500).json({ error: 'Login failed' });
     }
   });
 

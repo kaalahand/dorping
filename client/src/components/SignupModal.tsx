@@ -110,11 +110,31 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToSi
     const authWindow = window.open('/auth/google', '_blank', 'width=500,height=600');
     
     // Listen for authentication success message
-    const handleMessage = (event: MessageEvent) => {
+    const handleMessage = async (event: MessageEvent) => {
       if (event.data.type === 'AUTH_SUCCESS') {
         window.removeEventListener('message', handleMessage);
-        onSuccess(event.data.user);
-        window.location.reload();
+        
+        // Manually authenticate the user in the main window session
+        try {
+          const response = await fetch('/api/auth/google-login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId: event.data.user.id }),
+          });
+          
+          const data = await response.json();
+          if (data.authenticated) {
+            onSuccess(data.user);
+            window.location.reload();
+          }
+        } catch (error) {
+          console.error('Manual authentication error:', error);
+          // Fallback to direct user data
+          onSuccess(event.data.user);
+          window.location.reload();
+        }
       }
     };
     
