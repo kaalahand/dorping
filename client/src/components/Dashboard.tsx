@@ -960,14 +960,15 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
         </div>
       </div>
 
-      {/* Floating Expand Button - Only visible when sidebar is collapsed */}
+      {/* Expand Button at Sidebar Edge - Only visible when sidebar is collapsed */}
       {sidebarCollapsed && (
         <button
           onClick={() => setSidebarCollapsed(false)}
-          className="fixed left-4 top-20 z-50 p-2 bg-blue-500 hover:bg-blue-600 rounded-full shadow-lg text-white transition-all duration-200 hover:shadow-xl"
+          className="fixed left-16 top-1/2 transform -translate-y-1/2 z-50 p-3 bg-white border-l-0 border border-gray-200 rounded-r-lg shadow-lg hover:bg-gray-50 transition-all duration-200 hover:shadow-xl"
           title="Expand sidebar"
+          style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
         >
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="w-4 h-4 text-gray-600" />
         </button>
       )}
 
