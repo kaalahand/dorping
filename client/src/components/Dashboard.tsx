@@ -964,10 +964,10 @@ Feel free to modify, expand, or adapt this content to better suit your specific 
       {sidebarCollapsed && (
         <button
           onClick={() => setSidebarCollapsed(false)}
-          className="fixed left-4 top-6 z-50 p-3 bg-white rounded-lg shadow-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 hover:shadow-xl"
+          className="fixed left-4 top-20 z-50 p-2 bg-blue-500 hover:bg-blue-600 rounded-full shadow-lg text-white transition-all duration-200 hover:shadow-xl"
           title="Expand sidebar"
         >
-          <ChevronRight className="w-5 h-5 text-gray-600" />
+          <ChevronRight className="w-4 h-4" />
         </button>
       )}
 
