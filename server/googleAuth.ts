@@ -63,8 +63,13 @@ export function setupGoogleAuth(app: Express) {
   app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/' }),
     (req, res) => {
-      // Successful authentication, redirect to dashboard
-      res.redirect('/?auth=success');
+      // Successful authentication, close popup window
+      res.send(`
+        <script>
+          window.close();
+        </script>
+        <p>Authentication successful! You can close this window.</p>
+      `);
     }
   );
 }

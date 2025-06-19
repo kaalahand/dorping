@@ -55,10 +55,28 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSwitchToSi
   };
 
   const handleGoogleSignIn = () => {
-    // Close modal first to avoid iframe issues
+    // Close modal first
     onClose();
-    // Redirect to Google OAuth endpoint in main window
-    window.top!.location.href = '/auth/google';
+    // Use window.open to bypass iframe restrictions
+    const authWindow = window.open('/auth/google', '_blank', 'width=500,height=600');
+    
+    // Listen for the auth completion
+    const checkAuth = setInterval(async () => {
+      try {
+        if (authWindow?.closed) {
+          clearInterval(checkAuth);
+          // Check if user is now authenticated
+          const response = await fetch('/api/auth/check');
+          const data = await response.json();
+          if (data.authenticated) {
+            onSuccess(data.user);
+            window.location.reload();
+          }
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+      }
+    }, 1000);
   };
 
   const handleForgotPassword = () => {
