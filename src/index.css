@@ -2,53 +2,117 @@
 @tailwind components;
 @tailwind utilities;
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+/* Reminology — Heirloom Editorial design tokens.
+   All colors in HSL. Tokens are the single source of truth. */
+
+@layer base {
+  :root {
+    /* Heirloom palette */
+    --paper: 47 67% 96%;              /* #FCFAF2 archival paper */
+    --surface-1: 47 38% 93%;          /* #F4F2E8 warm card */
+    --surface-2: 180 31% 93%;         /* #EAF4F4 pale teal wash */
+    --ink: 212 40% 17%;               /* #1A2B3C deep navy */
+    --ink-muted: 215 18% 35%;         /* #4A5568 */
+    --ink-faint: 213 14% 65%;         /* #9AA5B1 */
+    --teal: 180 100% 12%;             /* #003D3D */
+    --teal-hover: 178 100% 16%;       /* #00524E */
+    --gold: 43 55% 54%;               /* #C9A84C */
+    --divider: 42 18% 83%;            /* #DDD9CE */
+    --hairline: 212 40% 17%;          /* used with /10 opacity */
+
+    /* shadcn semantic mapping (kept consistent so existing UI primitives still work) */
+    --background: var(--paper);
+    --foreground: var(--ink);
+
+    --card: var(--surface-1);
+    --card-foreground: var(--ink);
+
+    --popover: var(--paper);
+    --popover-foreground: var(--ink);
+
+    --primary: var(--teal);
+    --primary-foreground: var(--paper);
+
+    --secondary: var(--surface-1);
+    --secondary-foreground: var(--ink);
+
+    --muted: var(--surface-1);
+    --muted-foreground: var(--ink-muted);
+
+    --accent: var(--surface-2);
+    --accent-foreground: var(--ink);
+
+    --destructive: 0 70% 45%;
+    --destructive-foreground: var(--paper);
+
+    --border: var(--divider);
+    --input: var(--divider);
+    --ring: var(--teal);
+
+    --radius: 0.5rem;
   }
-  to {
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    background-color: hsl(var(--paper));
+    color: hsl(var(--ink));
+    font-family: 'Inter', 'Helvetica Neue', system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: 'Lora', Georgia, serif;
+    text-wrap: balance;
+  }
+}
+
+@layer utilities {
+  .font-display { font-family: 'Lora', Georgia, serif; }
+  .font-body { font-family: 'Inter', sans-serif; }
+
+  .container-prose {
+    max-width: 1100px;
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+
+  .section-y {
+    padding-top: clamp(48px, 6vw, 96px);
+    padding-bottom: clamp(48px, 6vw, 96px);
+  }
+
+  .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+  }
+
+  /* Fade-up for IntersectionObserver */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 400ms ease, transform 400ms ease;
+    will-change: opacity, transform;
+  }
+  .fade-up.is-visible {
     opacity: 1;
     transform: translateY(0);
   }
-}
 
-.animate-fade-in {
-  animation: fade-in 0.5s ease-out;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Enhanced button hover effects */
-button {
-  transition: all 0.3s ease;
-}
-
-button:hover {
-  transform: translateY(-1px);
-}
-
-button:active {
-  transform: translateY(0);
+  @media (prefers-reduced-motion: reduce) {
+    .fade-up { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+  }
 }
