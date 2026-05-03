@@ -1,34 +1,56 @@
-# Robots.txt for Dorp AI
-# https://dorp.ai/robots.txt
+# Robots.txt for Reminology
+# https://reminology.com/robots.txt
 
 User-agent: *
 Allow: /
-
-# Sitemap location
-Sitemap: https://dorp.ai/sitemap.xml
-
-# Crawl-delay for respectful crawling
 Crawl-delay: 1
 
-# Disallow admin areas (if any in future)
+# Named bot allowances (social previews, AI crawlers)
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+# Allow AI training / LLM crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# Block admin and private API areas
 Disallow: /admin/
 Disallow: /api/private/
 
-# Allow important pages
+# Allow important pages explicitly
 Allow: /
-Allow: /about
-Allow: /blog
-Allow: /pricing
-Allow: /privacy-policy
-Allow: /terms-and-conditions
-Allow: /features
-Allow: /use-cases
-Allow: /support
+Allow: /privacy
+Allow: /terms
 
-# Block sensitive files
+# Block sensitive file types
 Disallow: /*.json$
-Disallow: /*.xml$ 
-Disallow: /sitemap.xml
 
-# Re-allow sitemap
-Allow: /sitemap.xml
+# Sitemap location
+Sitemap: https://reminology.com/sitemap.xml
