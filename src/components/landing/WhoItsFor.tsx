@@ -1,3 +1,4 @@
+import { CtaLink, WhatsAppIcon } from "./Cta";
 import { FadeUp } from "./FadeUp";
 
 export const WhoItsFor = () => {
@@ -23,7 +24,7 @@ export const WhoItsFor = () => {
                 The Keeper
               </p>
               <p className="mt-4 font-body text-[17px] text-ink-muted" style={{ lineHeight: 1.75 }}>
-                You live in Europe. Your parents live in India. You video call every Sunday. You hear fragments about a village, a journey, a person who shaped them. But no one has ever asked them to tell the full story. Reminology does that for you.
+                You live in Europe. Your parents live in India. You hear fragments about a village, a journey, a person who shaped them. <strong className="text-ink">But no one has ever sat with them and asked: &ldquo;Tell me the whole story.&rdquo;</strong> Reminology does that for you, in their language, on their schedule.
               </p>
             </div>
           </FadeUp>
@@ -34,7 +35,7 @@ export const WhoItsFor = () => {
                 The Gifter
               </p>
               <p className="mt-4 font-body text-[17px] text-ink-muted" style={{ lineHeight: 1.75 }}>
-                Birthdays. Diwali. An anniversary. A book of your parent&rsquo;s stories, written in their voice, printed and delivered, is the most meaningful gift you will ever give your family. The kind that cannot be bought in a store.
+                You want to give your family something no store sells. <strong className="text-ink">A book of your parent&rsquo;s stories, written in their voice, printed and delivered.</strong> The gift they didn&rsquo;t know they wanted. The one they will never stop talking about.
               </p>
             </div>
           </FadeUp>
@@ -45,11 +46,19 @@ export const WhoItsFor = () => {
                 The Urgent One
               </p>
               <p className="mt-4 font-body text-[17px] text-ink-muted" style={{ lineHeight: 1.75 }}>
-                You feel the window closing. Your parent is ageing. You live with a quiet background anxiety that one day it will be too late. Reminology is for the ones who refuse to let that moment arrive without having done something.
+                You feel the window closing. Your parent is ageing. <strong className="text-ink">You live with a quiet background fear that one day it will be too late.</strong> Reminology is for the ones who refuse to let that moment arrive without having done something about it.
               </p>
             </div>
           </FadeUp>
         </div>
+
+        <FadeUp delay={400}>
+          <div className="mt-10 flex justify-center max-w-[820px]">
+            <CtaLink href="https://wa.me/+31630071724?text=Hi%2C%20I%20want%20to%20preserve%20my%20parent%27s%20stories" target="_blank" rel="noopener noreferrer" variant="primary">
+              <WhatsAppIcon /> Begin Your Family's Story, Free
+            </CtaLink>
+          </div>
+        </FadeUp>
       </div>
     </section>
   );

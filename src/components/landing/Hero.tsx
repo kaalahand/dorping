@@ -10,7 +10,7 @@ export const Hero = () => {
         <div className="max-w-[760px] mx-auto text-center">
           <FadeUp>
             <p className="eyebrow text-ink-muted">
-              For Indian families in Europe&nbsp; · &nbsp;Hindi &amp; Bengali&nbsp; · &nbsp;GDPR compliant
+              For Indian families in Europe&nbsp; · &nbsp;GDPR compliant
             </p>
           </FadeUp>
 
@@ -19,13 +19,13 @@ export const Hero = () => {
               className="mt-6 font-display font-semibold text-ink"
               style={{ fontSize: "clamp(44px, 5vw, 68px)", lineHeight: 1.1 }}
             >
-              Their stories<br />won&rsquo;t wait.
+              Your parents&rsquo; stories<br />deserve to live forever.
             </h1>
           </FadeUp>
 
           <FadeUp delay={160}>
             <p className="mt-6 mx-auto font-body text-[17px] text-ink-muted max-w-[560px] text-left" style={{ lineHeight: 1.75 }}>
-              Your parents have stories you have never heard. We capture them, in their native language, over WhatsApp and turn them into a hardcover book and a secure, private online portal your family keeps forever.
+              Your parents carry decades of stories you have never heard. Reminology guides them through thoughtful conversations, in their own language, and transforms what they share into a beautifully written hardcover book your family keeps forever.
             </p>
           </FadeUp>
 
@@ -38,7 +38,7 @@ export const Hero = () => {
           <FadeUp delay={240}>
             <div className="mt-5 flex flex-wrap gap-4 justify-center">
               <CtaLink href="https://wa.me/+31630071724?text=Hi%2C%20I%20want%20to%20preserve%20my%20parent%27s%20stories" target="_blank" rel="noopener noreferrer" variant="primary">
-                <WhatsAppIcon /> Start a Free Story on WhatsApp
+                <WhatsAppIcon /> Begin Your Family's Story, Free
               </CtaLink>
               <CtaLink href="#how-it-works" variant="secondary">
                 See How It Works
@@ -48,13 +48,7 @@ export const Hero = () => {
 
           <FadeUp delay={300}>
             <p className="mt-3 font-body text-[13px] text-ink-faint">
-              Opens WhatsApp · Takes 2 minutes
-            </p>
-          </FadeUp>
-
-          <FadeUp delay={320}>
-            <p className="mt-2 font-body text-[13px] text-ink-faint">
-              No app download. No account. Just WhatsApp.
+              No app to download. No account needed. Takes 2 minutes to start.
             </p>
           </FadeUp>
 

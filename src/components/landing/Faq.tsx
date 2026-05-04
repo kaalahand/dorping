@@ -3,12 +3,20 @@ import { FadeUp } from "./FadeUp";
 
 const items = [
   {
+    q: "What if my parent doesn't want to participate?",
+    a: "Most parents are hesitant at first. That is completely normal. We send your parent a link on WhatsApp. They click it, join a call room in their browser, and our interviewer guides them through the first session with a warm, thoughtful question about their childhood. After the first session, most parents ask when the next one is.",
+  },
+  {
+    q: "How is this different from me just recording a phone call with my parent?",
+    a: "Three things you cannot replicate on your own. First, our questions are designed to trigger specific memories. Not \"tell me about your life\" but \"what did your house smell like during Diwali when you were ten?\" Second, our system builds on previous sessions, so each conversation goes deeper. Third, we transform the raw conversation into a structured, beautifully written narrative in your parent's voice. Not a transcript, not a summary. A story.",
+  },
+  {
     q: "Does my parent need to download an app?",
-    a: "No. Your parent receives a WhatsApp message from you with a simple link. They tap it, give a one-time consent, and begin talking. No download. No account. Just one tap on the app they already use every day.",
+    a: "No. Your parent receives a link on WhatsApp. They tap it, give a one-time consent, and join a call room in their browser. No download. No account.",
   },
   {
     q: "Which languages are supported?",
-    a: "We currently support English and Hindi (Beta). Bengali launches in June 2026, with Tamil following in Phase 2. If your parent speaks a language not yet supported, join our waitlist and we prioritise based on demand.",
+    a: "We currently support English and Hindi (Beta), with more Indian languages launching in 2026. If your parent's language isn't listed yet, join our waitlist and we prioritise based on demand.",
   },
   {
     q: "What if the call drops or my parent gets disconnected?",

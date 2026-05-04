@@ -34,10 +34,10 @@ export const StickyCta = () => {
       <div className="container-prose flex items-center justify-end gap-3 py-3">
         <div className="flex items-center gap-3">
           <CtaLink href="https://wa.me/+31630071724?text=Hi%2C%20I%20want%20to%20preserve%20my%20parent%27s%20stories" target="_blank" rel="noopener noreferrer" variant="primary">
-            <WhatsAppIcon /> Start a Free Story on WhatsApp
+            <WhatsAppIcon /> Begin Your Family's Story, Free
           </CtaLink>
           <span className="hidden sm:inline font-body text-[13px]" style={{ color: "hsl(var(--paper) / 0.7)" }}>
-            First 5 stories free
+            Free to start · No download needed
           </span>
         </div>
       </div>

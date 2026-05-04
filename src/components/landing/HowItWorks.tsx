@@ -4,18 +4,28 @@ import { FadeUp } from "./FadeUp";
 const steps = [
   {
     n: "01",
-    title: "You message us on WhatsApp",
-    body: "No download, no account, no password. Message us on WhatsApp and we guide you through a simple setup in under 3 minutes. Your parent doesn't need to install anything.",
+    title: "You tell us about your parent",
+    body: "Message us and share a little about your family. Who is the storyteller? What language do they speak? What part of their life are you most curious about? We use this to design a personalised conversation path, not a generic questionnaire.",
   },
   {
     n: "02",
-    title: "We guide a voice call with your parent",
-    body: "We send you a secure private call link. You share it with your parent on WhatsApp. They click, give a one-time consent, and tell their story in their own language. Our AI listens and asks follow-up questions.",
+    title: "A simple call, in their own language",
+    body: "Your parent receives a link on WhatsApp. They click it, join a call room in their browser, and simply talk. No download, no login, no learning curve.",
   },
   {
     n: "03",
-    title: "You receive a story and a hardcover book",
-    body: "Our AI transforms the conversation into a beautifully written narrative in your parent's own voice. Each session captures one story, a chapter in their life. Most families complete 8 to 12 sessions over a few months, building a full hardcover book. Add photos. We print and deliver a premium A5 hardcover to your home in Europe.",
+    title: "Our system asks questions that unlock memory",
+    body: "This is not a recording app. Our AI interviewer asks carefully designed questions that trigger specific memories: the kind your parent wouldn’t think to tell unprompted. ‘What did your mother cook on the day you got your exam results?’ ‘What was the first thing you bought with your own money?’ Each question builds on what they said before.",
+  },
+  {
+    n: "04",
+    title: "Stories unfold across multiple sessions",
+    body: "One call captures one story. Over 8 to 12 sessions across a few weeks, a full life narrative takes shape: childhood, marriage, migration, parenthood. Each session picks up where the last one left off. Your parent looks forward to the next call.",
+  },
+  {
+    n: "05",
+    title: "We transform voice into a written narrative",
+    body: "Our AI doesn’t just transcribe. It transforms your parent’s spoken words into a beautifully structured narrative written in their voice. You review it. Add photos. Approve each story before it becomes a chapter in their book.",
   },
 ];
 
@@ -31,7 +41,7 @@ export const HowItWorks = () => {
             className="mt-6 font-display font-semibold text-ink"
             style={{ fontSize: "clamp(32px, 4vw, 48px)", lineHeight: 1.15 }}
           >
-            Three steps. One conversation.<br />A book that lasts forever.
+            A guided journey, not a single conversation.<br />Stories that unfold over weeks.
           </h2>
         </FadeUp>
 
@@ -65,7 +75,7 @@ export const HowItWorks = () => {
         <FadeUp delay={240}>
           <div className="mt-10 flex justify-center border-t border-divider pt-8 max-w-[680px] mx-auto">
             <CtaLink href="https://wa.me/+31630071724?text=Hi%2C%20I%20want%20to%20preserve%20my%20parent%27s%20stories" target="_blank" rel="noopener noreferrer" variant="primary">
-              <WhatsAppIcon /> Start a Free Story on WhatsApp
+              <WhatsAppIcon /> Begin Your Family's Story, Free
             </CtaLink>
           </div>
         </FadeUp>

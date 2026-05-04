@@ -1,3 +1,4 @@
+import { CtaLink, WhatsAppIcon } from "./Cta";
 import { FadeUp } from "./FadeUp";
 import { Check } from "lucide-react";
 
@@ -41,12 +42,12 @@ const BookMockup = () => (
 );
 
 const features = [
-  "A5 hardcover format, up to 200 pages",
-  "Stories written in your parent's own voice",
-  "QR codes on every page: scan to hear your parent tell the story in their own voice",
-  "Add sibling copies for €49 each",
-  "Printed in the Netherlands",
-  "Delivered to Europe in 5 to 10 business days",
+  "Stories written in your parent's own voice, not a robotic transcript",
+  "QR codes on every page: scan to hear your parent tell the story aloud",
+  "Premium A5 hardcover, up to 200 pages, mixed black-and-white and colour",
+  "Order sibling copies for €49 each, one for every branch of the family",
+  "Printed in the Netherlands, delivered in 5 to 10 business days",
+  "Secure online portal: your family's stories, accessible forever",
 ];
 
 export const BookSection = () => {
@@ -59,13 +60,13 @@ export const BookSection = () => {
             className="mt-6 font-display font-semibold text-paper"
             style={{ fontSize: "clamp(30px, 3.5vw, 44px)", lineHeight: 1.15 }}
           >
-            Not just a digital archive.<br />A physical book you can hold.
+            A book for generations.<br />A portal for forever.
           </h2>
           <p
             className="mt-6 font-body text-[17px]"
             style={{ color: "hsl(var(--paper) / 0.80)", lineHeight: 1.75 }}
           >
-            Every story your parent tells becomes a chapter. Every photo becomes a page. We print it as a premium A5 hardcover, mixed black and white with selective colour pages, and ship it to your door in Europe.
+            Every story your parent tells becomes a chapter. Every photo you add becomes a page. The result is a premium hardcover book, printed in the Netherlands, delivered to your door. And a secure online portal where your family&rsquo;s stories live forever, accessible to you and every generation that follows.
           </p>
 
           <ul className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
@@ -76,6 +77,12 @@ export const BookSection = () => {
               </li>
             ))}
           </ul>
+
+          <div className="mt-10">
+            <CtaLink href="https://wa.me/+31630071724?text=Hi%2C%20I%20want%20to%20preserve%20my%20parent%27s%20stories" target="_blank" rel="noopener noreferrer" variant="inverse">
+              <WhatsAppIcon /> Start Your Free Family Story Now
+            </CtaLink>
+          </div>
         </FadeUp>
 
         <FadeUp delay={120} className="order-1 md:order-2">

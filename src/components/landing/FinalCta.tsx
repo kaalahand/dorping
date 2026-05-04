@@ -10,7 +10,7 @@ export const FinalCta = () => {
             className="mx-auto font-display font-semibold text-paper max-w-[820px]"
             style={{ fontSize: "clamp(32px, 4.5vw, 54px)", lineHeight: 1.15 }}
           >
-            The story that needs to be told<br />is waiting. So is your parent.
+            Your parent has a story<br />only they can tell.<br />Help them tell it.
           </h2>
         </FadeUp>
 
@@ -19,14 +19,14 @@ export const FinalCta = () => {
             className="mt-4 mx-auto font-body text-[17px] max-w-[480px]"
             style={{ color: "hsl(var(--paper) / 0.75)", lineHeight: 1.7 }}
           >
-            Start your first memory conversation today. Free. No commitment. No download. Just WhatsApp.
+            Start your first conversation today. Free. No commitment. Your parent talks in their language. You receive a written story within 48 hours.
           </p>
         </FadeUp>
 
         <FadeUp delay={200}>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <CtaLink href="https://wa.me/+31630071724?text=Hi%2C%20I%20want%20to%20preserve%20my%20parent%27s%20stories" target="_blank" rel="noopener noreferrer" variant="inverse">
-              <WhatsAppIcon /> Start a Free Story on WhatsApp
+              <WhatsAppIcon /> Begin Your Family's Story, Free
             </CtaLink>
             <CtaLink
               href="#how-it-works"
@@ -40,7 +40,7 @@ export const FinalCta = () => {
 
         <FadeUp delay={280}>
           <p className="mt-6 font-body text-[13px]" style={{ color: "hsl(var(--paper) / 0.5)" }}>
-            €49 founding price · 25 stories captured · First 5 stories free
+            €49 founding price until 31 May · First 5 stories free · No card required
           </p>
         </FadeUp>
       </div>

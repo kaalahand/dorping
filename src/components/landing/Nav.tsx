@@ -5,7 +5,7 @@ import logo from "@/assets/logo.png";
 const links = [
   { href: "#how-it-works", label: "How It Works" },
   { href: "#faq", label: "FAQ" },
-  { href: "#what", label: "What is Reminology?" },
+  { href: "#what", label: "Why It Matters" },
 ];
 
 export const Nav = () => {
@@ -62,7 +62,7 @@ export const Nav = () => {
 
           <div className="hidden lg:block">
             <CtaLink href="https://wa.me/+31630071724?text=Hi%2C%20I%20want%20to%20preserve%20my%20parent%27s%20stories" target="_blank" rel="noopener noreferrer" variant="primary">
-              <WhatsAppIcon /> Start a Free Story on WhatsApp
+              <WhatsAppIcon /> Begin Your Family's Story
             </CtaLink>
           </div>
 
@@ -110,7 +110,7 @@ export const Nav = () => {
             </a>
           ))}
           <CtaLink href="https://wa.me/+31630071724?text=Hi%2C%20I%20want%20to%20preserve%20my%20parent%27s%20stories" target="_blank" rel="noopener noreferrer" variant="primary" className="mt-4 w-full" onClick={() => setOpen(false)}>
-            <WhatsAppIcon /> Start a Free Story on WhatsApp
+            <WhatsAppIcon /> Begin Your Family's Story
           </CtaLink>
         </div>
       </div>
